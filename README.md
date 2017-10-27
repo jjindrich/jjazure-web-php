@@ -1,4 +1,4 @@
-# JJWeb PHP site in docker
+# JJWeb PHP site in Azure Web App with Docker
 This project contains simple PHP website. This website is packaged into docker container.
 Container is hosted in Azure Web App.
 
@@ -43,10 +43,31 @@ Select Azure Container Repository, specify images and click Create.
 Browse website <a href="http://jjweblinux.azurewebsites.net">http://jjweblinux.azurewebsites.net</a>
 
 ## Monitor with Application Insights
-Azure Application Insights gives you great telemetry about using your website.
-To enable it, go to Web App, select Monitoring section and enable AI. The resource in Azure will be created.
+Azure Application Insights gives you great telemetry about using your website (jjwebphpai).
+To enable it, go to Web App, select Monitoring section and enable AI. The resource in Azure will be created. 
+Use <a href="https://github.com/Microsoft/ApplicationInsights-php">Application Insights for PHP</a> extension.
 
+### Install PHP composer
+Install PHP composer to get Application Insights packages.
+https://getcomposer.org/download/
+
+### Compile PHP project
+```
+cd jjwebphpai/src
 php ~/composer.phar install
+```
 
-Now extend you php web application based on <a href="https://github.com/Microsoft/ApplicationInsights-php">Application Insights for PHP</a>.
+## Compile image
+```
+docker build jjwebphpai -t jjwebphp
+docker images
+```
 
+# JJWeb PHP site in Azure Web App with PHP
+This project contains simple PHP website. This website is running in Azure Web App with enabled PHP framework.
+
+How to deploy in Web App ?
+https://docs.microsoft.com/en-us/azure/app-service/app-service-web-get-started-php
+
+How to customize Web App settings ?
+https://docs.microsoft.com/en-us/azure/app-service/web-sites-php-configure

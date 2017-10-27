@@ -46,5 +46,7 @@ Browse website <a href="http://jjweblinux.azurewebsites.net">http://jjweblinux.a
 Azure Application Insights gives you great telemetry about using your website.
 To enable it, go to Web App, select Monitoring section and enable AI. The resource in Azure will be created.
 
+php ~/composer.phar install
+
 Now extend you php web application based on <a href="https://github.com/Microsoft/ApplicationInsights-php">Application Insights for PHP</a>.
 

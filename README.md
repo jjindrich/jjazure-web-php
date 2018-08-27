@@ -71,3 +71,22 @@ https://docs.microsoft.com/en-us/azure/app-service/app-service-web-get-started-p
 
 How to customize Web App settings ?
 https://docs.microsoft.com/en-us/azure/app-service/web-sites-php-configure
+
+
+# JJWeb PHP site in Azure Kubernetes Service
+Compile image and publish into Azure Container Registry associated with Azure Kubernetes Service (AKS).
+
+```
+docker build jjwebphpai -t jjwebphpai
+docker tag jjwebphpai jjdotnetcoreaf9d.azurecr.io/jjwebphpai:1
+ddocker push jjdotnetcoreaf9d.azurecr.io/jjwebphpai
+```
+
+Publish service in AKS
+- Run AKS dashboard
+- Select Overview and Create an App
+- Type your container and Service External
+
+After several minutes there will be published external IP on AKS dashboard.
+
+

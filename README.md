@@ -87,6 +87,8 @@ Publish service in AKS
 - Select Overview and Create an App
 - Type your container and Service External
 
+Or you can use yaml definition from charts folder - it not contains resource External service endpoint.
+
 After several minutes there will be published external IP on AKS dashboard.
 
 

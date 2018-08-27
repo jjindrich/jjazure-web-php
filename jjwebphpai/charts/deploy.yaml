@@ -1,0 +1,39 @@
+{
+  "kind": "Deployment",
+  "apiVersion": "extensions/v1beta1",
+  "metadata": {
+    "name": "jjwebphpai",
+    "namespace": "dev",
+    "selfLink": "/apis/extensions/v1beta1/namespaces/dev/deployments/jjwebphpai",
+    "labels": {
+      "k8s-app": "jjwebphpai"
+    },
+    "annotations": {
+      "deployment.kubernetes.io/revision": "1"
+    }
+  },
+  "spec": {
+    "replicas": 2,
+    "selector": {
+      "matchLabels": {
+        "k8s-app": "jjwebphpai"
+      }
+    },
+    "template": {
+      "metadata": {
+        "name": "jjwebphpai",
+        "labels": {
+          "k8s-app": "jjwebphpai"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "jjwebphpai",
+            "image": "jjdotnetcoreaf9d.azurecr.io/jjwebphpai:2"
+          }
+        ]
+      }
+    }
+  }
+}

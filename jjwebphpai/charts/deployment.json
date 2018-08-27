@@ -3,14 +3,7 @@
   "apiVersion": "extensions/v1beta1",
   "metadata": {
     "name": "jjwebphpai",
-    "namespace": "dev",
-    "selfLink": "/apis/extensions/v1beta1/namespaces/dev/deployments/jjwebphpai",
-    "labels": {
-      "k8s-app": "jjwebphpai"
-    },
-    "annotations": {
-      "deployment.kubernetes.io/revision": "1"
-    }
+    "namespace": "dev"
   },
   "spec": {
     "replicas": 2,

@@ -1,0 +1,27 @@
+{
+  "kind": "Service",
+  "apiVersion": "v1",
+  "metadata": {
+    "name": "jjwebphpai",
+    "namespace": "dev",
+    "labels": {
+      "k8s-app": "jjwebphpai"
+    }
+  },
+  "spec": {
+    "ports": [
+      {
+        "name": "tcp-80-80",
+        "protocol": "TCP",
+        "port": 80,
+        "targetPort": 80
+      }
+    ],
+    "selector": {
+      "k8s-app": "jjwebphpai"
+    },
+    "type": "LoadBalancer",
+    "sessionAffinity": "None",
+    "externalTrafficPolicy": "Cluster"
+  }
+}

@@ -15,6 +15,11 @@ $telemetryClient = new \ApplicationInsights\Telemetry_Client();
 $telemetryClient->getContext()->setInstrumentationKey('0c68ddde-8a99-4f53-ad47-1a8c854e51cf');
 
 
+// setup for correct data correlations
+$telemetryClient->getContext()->getOperationContext()->setId('XX');
+$telemetryClient->getContext()->getOperationContext()->setName('GET Index');
+
+
 // send server request
 $duration = 5;
 $url = "http:\\phpsite";
@@ -30,6 +35,12 @@ $telemetryClient->trackRequest($requestName, $url, $startTime, $duration, http_r
 // track dependency calls
 $durationService = rand(1, 20);
 $telemetryClient->trackDependency('JJWebService', \ApplicationInsights\Channel\Contracts\Dependency_Type::HTTP, 'Service Command', $durationService, 23, $success, 200);
+
+$telemetryClient->trackDependency('SQL1', "SQL", 'SELECT * from neco', $durationService);
+$telemetryClient->trackDependency('SQL2', "SQL", 'SELECT * from neco', $durationService);
+$telemetryClient->trackDependency('SQL3', "SQL", 'SELECT * from neco', $durationService);
+
+$telemetryClient->trackDependency('SQL3', \ApplicationInsights\Channel\Contracts\Dependency_Type::SQL, 'SELECT * from neco', $durationService);
 
 // catch exception
 try

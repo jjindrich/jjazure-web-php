@@ -12,7 +12,7 @@
 require_once 'vendor/autoload.php';
 
 $telemetryClient = new \ApplicationInsights\Telemetry_Client();
-$telemetryClient->getContext()->setInstrumentationKey('0c68ddde-8a99-4f53-ad47-1a8c854e51cf');
+$telemetryClient->getContext()->setInstrumentationKey('d7b5c22e-00e1-424a-8d25-c0b2127c763d');
 
 
 // setup for correct data correlations
@@ -36,9 +36,9 @@ $telemetryClient->trackRequest($requestName, $url, $startTime, $duration, http_r
 $durationService = rand(1, 20);
 $telemetryClient->trackDependency('JJWebService', \ApplicationInsights\Channel\Contracts\Dependency_Type::HTTP, 'Service Command', $durationService, 23, $success, 200);
 
-$telemetryClient->trackDependency('SQL1', "SQL", 'SELECT * from neco', $durationService);
-$telemetryClient->trackDependency('SQL2', "SQL", 'SELECT * from neco', $durationService);
-$telemetryClient->trackDependency('SQL3', "SQL", 'SELECT * from neco', $durationService);
+$telemetryClient->trackDependency('SQL1', "SQL", 'SELECT * from neco', null,  $durationService);
+$telemetryClient->trackDependency('SQL2', "SQL", 'SELECT * from neco', null, $durationService);
+$telemetryClient->trackDependency('SQL3', "SQL", 'SELECT * from neco', null, $durationService);
 
 $telemetryClient->trackDependency('SQL3', \ApplicationInsights\Channel\Contracts\Dependency_Type::SQL, 'SELECT * from neco', $durationService);
 

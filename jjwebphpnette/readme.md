@@ -2,9 +2,12 @@
 About Nette https://nette.org/en/download
 
 ## Create Nette project and run
-```php
+
+Create new Nette project or use example (used https://github.com/nette/examples/tree/master/Fifteen)
+```
 composer create-project nette/web-project
-php -S localhost:8000 -t www
+composer update
+php -S localhost:80 -t www
 ```
 
 ## Prepare docker image and run
@@ -12,3 +15,13 @@ php -S localhost:8000 -t www
 docker build jjwebphpnette -t jjwebphpnette
 docker run -p 80:80 jjwebphpnette
 ```
+
+Open browser with url http://localhost/www
+
+## Deploy to Azure Container Registry
+
+TODO
+
+## Run in Azure Container Instance
+
+TODO

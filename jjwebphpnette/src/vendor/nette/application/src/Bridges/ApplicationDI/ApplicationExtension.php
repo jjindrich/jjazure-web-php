@@ -5,6 +5,8 @@
  * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
+declare(strict_types=1);
+
 namespace Nette\Bridges\ApplicationDI;
 
 use Composer\Autoload\ClassLoader;
@@ -16,9 +18,9 @@ use Tracy;
 /**
  * Application extension for Nette DI.
  */
-class ApplicationExtension extends Nette\DI\CompilerExtension
+final class ApplicationExtension extends Nette\DI\CompilerExtension
 {
-	public $defaults = [
+	private $defaults = [
 		'debugger' => null,
 		'errorPresenter' => 'Nette:Error',
 		'catchExceptions' => null,
@@ -39,7 +41,7 @@ class ApplicationExtension extends Nette\DI\CompilerExtension
 	private $tempFile;
 
 
-	public function __construct($debugMode = false, array $scanDirs = null, $tempDir = null)
+	public function __construct(bool $debugMode = false, array $scanDirs = null, string $tempDir = null)
 	{
 		$this->defaults['debugger'] = interface_exists(Tracy\IBarPanel::class);
 		$this->defaults['scanDirs'] = (array) $scanDirs;
@@ -104,7 +106,7 @@ class ApplicationExtension extends Nette\DI\CompilerExtension
 		$counter = 0;
 		foreach ($this->findPresenters() as $class) {
 			if (empty($all[$class])) {
-				$all[$class] = $builder->addDefinition($this->prefix(++$counter))->setClass($class);
+				$all[$class] = $builder->addDefinition($this->prefix((string) ++$counter))->setClass($class);
 			}
 		}
 
@@ -119,8 +121,7 @@ class ApplicationExtension extends Nette\DI\CompilerExtension
 	}
 
 
-	/** @return string[] */
-	private function findPresenters()
+	private function findPresenters(): array
 	{
 		$config = $this->getConfig();
 		$classes = [];
@@ -142,9 +143,9 @@ class ApplicationExtension extends Nette\DI\CompilerExtension
 			$classFile = dirname($rc->getFileName()) . '/autoload_classmap.php';
 			if (is_file($classFile)) {
 				$this->getContainerBuilder()->addDependency($classFile);
-				$classes = array_merge($classes, array_keys(call_user_func(function ($path) {
+				$classes = array_merge($classes, array_keys((function ($path) {
 					return require $path;
-				}, $classFile)));
+				})($classFile)));
 			}
 		}
 

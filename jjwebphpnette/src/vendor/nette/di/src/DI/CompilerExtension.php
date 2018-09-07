@@ -5,6 +5,8 @@
  * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
+declare(strict_types=1);
+
 namespace Nette\DI;
 
 use Nette;
@@ -30,7 +32,7 @@ abstract class CompilerExtension
 	/**
 	 * @return static
 	 */
-	public function setCompiler(Compiler $compiler, $name)
+	public function setCompiler(Compiler $compiler, string $name)
 	{
 		$this->compiler = $compiler;
 		$this->name = $name;
@@ -50,30 +52,25 @@ abstract class CompilerExtension
 
 	/**
 	 * Returns extension configuration.
-	 * @return array
 	 */
-	public function getConfig()
+	public function getConfig(): array
 	{
-		if (func_num_args()) { // deprecated
-			return Config\Helpers::merge($this->config, $this->getContainerBuilder()->expand(func_get_arg(0)));
-		}
 		return $this->config;
 	}
 
 
 	/**
 	 * Checks whether $config contains only $expected items and returns combined array.
-	 * @return array
 	 * @throws Nette\InvalidStateException
 	 */
-	public function validateConfig(array $expected, array $config = null, $name = null)
+	public function validateConfig(array $expected, array $config = null, string $name = null): array
 	{
 		if (func_num_args() === 1) {
 			return $this->config = $this->validateConfig($expected, $this->config);
 		}
 		if ($extra = array_diff_key((array) $config, $expected)) {
 			$name = $name ?: $this->name;
-			$hint = Nette\Utils\ObjectMixin::getSuggestion(array_keys($expected), key($extra));
+			$hint = Nette\Utils\ObjectHelpers::getSuggestion(array_keys($expected), key($extra));
 			$extra = $hint ? key($extra) : implode(", $name.", array_keys($extra));
 			throw new Nette\InvalidStateException("Unknown configuration option $name.$extra" . ($hint ? ", did you mean $name.$hint?" : '.'));
 		}
@@ -81,10 +78,7 @@ abstract class CompilerExtension
 	}
 
 
-	/**
-	 * @return ContainerBuilder
-	 */
-	public function getContainerBuilder()
+	public function getContainerBuilder(): ContainerBuilder
 	{
 		return $this->compiler->getContainerBuilder();
 	}
@@ -92,24 +86,26 @@ abstract class CompilerExtension
 
 	/**
 	 * Reads configuration from file.
-	 * @param  string  file name
-	 * @return array
 	 */
-	public function loadFromFile($file)
+	public function loadFromFile(string $file): array
 	{
-		$loader = new Config\Loader;
+		$loader = $this->createLoader();
 		$res = $loader->load($file);
 		$this->compiler->addDependencies($loader->getDependencies());
 		return $res;
 	}
 
 
+	protected function createLoader(): Config\Loader
+	{
+		return new Config\Loader;
+	}
+
+
 	/**
 	 * Prepend extension name to identifier or service name.
-	 * @param  string
-	 * @return string
 	 */
-	public function prefix($id)
+	public function prefix(string $id): string
 	{
 		return substr_replace($id, $this->name . '.', substr($id, 0, 1) === '@' ? 1 : 0, 0);
 	}

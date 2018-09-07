@@ -5,6 +5,8 @@
  * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
+declare(strict_types=1);
+
 namespace Nette\DI\Extensions;
 
 use Nette;
@@ -13,11 +15,10 @@ use Nette;
 /**
  * DI extension.
  */
-class DIExtension extends Nette\DI\CompilerExtension
+final class DIExtension extends Nette\DI\CompilerExtension
 {
 	public $defaults = [
 		'debugger' => true,
-		'accessors' => false,
 		'excluded' => [],
 		'parentClass' => null,
 	];
@@ -29,7 +30,7 @@ class DIExtension extends Nette\DI\CompilerExtension
 	private $time;
 
 
-	public function __construct($debugMode = false)
+	public function __construct(bool $debugMode = false)
 	{
 		$this->debugMode = $debugMode;
 		$this->time = microtime(true);
@@ -61,7 +62,7 @@ class DIExtension extends Nette\DI\CompilerExtension
 		}
 
 		foreach (array_filter($builder->findByTag('run')) as $name => $on) {
-			$initialize->addBody('$this->getService(?);', [$name]);
+			$initialize->addBody('$this->getService(?);', [(string) $name]);
 		}
 	}
 }

@@ -1,0 +1,20 @@
+%A%<a href="%A%"%A%>n:href before n:class</a>
+
+<a href="%A%"%A%>n:href after n:class</a>
+
+<a href="%A%"%A%>href before n:class</a>
+
+<a href="%A%"%A%>href after n:class</a>
+
+<?php
+		if ($this->global->uiPresenter->getLastCreatedRequestFlag("current")) {
+			?>empty<?php
+		}
+?>
+
+
+<?php
+		if ($this->global->uiPresenter->isLinkCurrent("default")) {
+			?>default<?php
+		}
+%A%

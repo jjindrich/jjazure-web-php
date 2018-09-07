@@ -5,6 +5,8 @@
  * Copyright (c) 2008 David Grudl (https://davidgrudl.com)
  */
 
+declare(strict_types=1);
+
 namespace Latte;
 
 
@@ -23,11 +25,11 @@ class CompileException extends \Exception
 	public $sourceLine;
 
 
-	public function setSource($code, $line, $name = null)
+	public function setSource(string $code, int $line, string $name = null)
 	{
-		$this->sourceCode = (string) $code;
-		$this->sourceLine = (int) $line;
-		$this->sourceName = (string) $name;
+		$this->sourceCode = $code;
+		$this->sourceLine = $line;
+		$this->sourceName = $name;
 		if (@is_file($name)) { // @ - may trigger error
 			$this->message = rtrim($this->message, '.')
 				. ' in ' . str_replace(dirname(dirname($name)), '...', $name) . ($line ? ":$line" : '');
@@ -54,7 +56,7 @@ class RegexpException extends \Exception
 
 	public function __construct($message, $code = null)
 	{
-		parent::__construct($message ?: (isset(self::$messages[$code]) ? self::$messages[$code] : 'Unknown error'), $code);
+		parent::__construct($message ?: (self::$messages[$code] ?? 'Unknown error'), $code);
 	}
 }
 

@@ -1,0 +1,21 @@
+section:
+	webname: "the example"
+	database:
+		adapter: pdo_mysql
+		params:
+			host: db.example.com
+			username: dbuser
+			password: secret
+			dbname: dbname
+
+	timeout: 10
+	display_errors: true
+	html_errors: no
+	items: [10, 20]
+	php:
+		zlib.output_compression = true
+		date.timezone = "Europe/Prague"
+
+override!:
+
+nothing:

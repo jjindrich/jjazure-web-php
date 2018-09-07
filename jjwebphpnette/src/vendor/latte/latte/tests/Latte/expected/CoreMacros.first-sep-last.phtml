@@ -1,0 +1,119 @@
+<?php
+%A%
+
+class Template%a% extends Latte\Runtime\Template
+{
+
+	function main()
+	{
+%A%
+?>
+
+<?php
+		$iterations = 0;
+		foreach ($iterator = $this->global->its[] = new LR\CachingIterator($people) as $person) {
+			?>	<?php
+			if ($iterator->isFirst()) {
+				?>(<?php
+			}
+			?> <?php
+			echo LR\Filters::escapeHtmlText($person) /* line 3 */;
+			if (!$iterator->isLast()) {
+				?>, <?php
+			}
+			?> <?php
+			if ($iterator->isLast()) {
+				?>)<?php
+			}
+?>
+
+<?php
+			$iterations++;
+		}
+		array_pop($this->global->its);
+		$iterator = end($this->global->its);
+?>
+
+
+<?php
+		$iterations = 0;
+		foreach ($iterator = $this->global->its[] = new LR\CachingIterator($people) as $person) {
+			?>	<?php
+			if ($iterator->isFirst(2)) {
+				?>(<?php
+			}
+			?> <?php
+			echo LR\Filters::escapeHtmlText($person) /* line 8 */;
+			if (!$iterator->isLast(2)) {
+				?>, <?php
+			}
+			?> <?php
+			if ($iterator->isLast(2)) {
+				?>)<?php
+			}
+?>
+
+<?php
+			$iterations++;
+		}
+		array_pop($this->global->its);
+		$iterator = end($this->global->its);
+?>
+
+
+<?php
+		$iterations = 0;
+		foreach ($iterator = $this->global->its[] = new LR\CachingIterator($people) as $person) {
+			?>	<?php
+			if ($iterator->isFirst(1)) {
+				?>(<?php
+			}
+			?> <?php
+			echo LR\Filters::escapeHtmlText($person) /* line 13 */;
+			if (!$iterator->isLast(1)) {
+				?>, <?php
+			}
+			?> <?php
+			if ($iterator->isLast(1)) {
+				?>)<?php
+			}
+?>
+
+<?php
+			$iterations++;
+		}
+		array_pop($this->global->its);
+		$iterator = end($this->global->its);
+?>
+
+
+<?php
+		$iterations = 0;
+		foreach ($iterator = $this->global->its[] = new LR\CachingIterator($people) as $person) {
+			if ($iterator->isFirst(0)) {
+				?>	<span>(</span><?php
+			}
+			?> <?php
+			echo LR\Filters::escapeHtmlText($person) /* line 18 */;
+			if (!$iterator->isLast()) {
+				?><span>, </span><?php
+			}
+			?> <?php
+			if ($iterator->isLast()) {
+?><span>)</span>
+<?php
+			}
+			$iterations++;
+		}
+		array_pop($this->global->its);
+		$iterator = end($this->global->its);
+%A%
+	}
+
+
+	function prepare()
+	{
+%A%
+	}
+
+}

@@ -5,6 +5,8 @@
  * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
+declare(strict_types=1);
+
 namespace Nette\Bridges\HttpDI;
 
 use Nette;
@@ -18,19 +20,22 @@ class HttpExtension extends Nette\DI\CompilerExtension
 	public $defaults = [
 		'proxy' => [],
 		'headers' => [
-			'X-Powered-By' => 'Nette Framework',
+			'X-Powered-By' => 'Nette Framework 3',
 			'Content-Type' => 'text/html; charset=utf-8',
 		],
 		'frames' => 'SAMEORIGIN', // X-Frame-Options
 		'csp' => [], // Content-Security-Policy
-		'csp-report' => [], // Content-Security-Policy-Report-Only
+		'cspReportOnly' => [], // Content-Security-Policy-Report-Only
+		'featurePolicy' => [], // Feature-Policy
+		'cookieSecure' => 'auto', // true|false|auto  Whether the cookie is available only through HTTPS
+		'sameSiteProtection' => true, // activates Request::isSameSite() protection
 	];
 
 	/** @var bool */
 	private $cliMode;
 
 
-	public function __construct($cliMode = false)
+	public function __construct(bool $cliMode = false)
 	{
 		$this->cliMode = $cliMode;
 	}
@@ -42,25 +47,40 @@ class HttpExtension extends Nette\DI\CompilerExtension
 		$config = $this->validateConfig($this->defaults);
 
 		$builder->addDefinition($this->prefix('requestFactory'))
-			->setClass(Nette\Http\RequestFactory::class)
+			->setFactory(Nette\Http\RequestFactory::class)
 			->addSetup('setProxy', [$config['proxy']]);
 
 		$builder->addDefinition($this->prefix('request'))
-			->setClass(Nette\Http\Request::class)
-			->setFactory('@Nette\Http\RequestFactory::createHttpRequest');
+			->setFactory('@Nette\Http\RequestFactory::createHttpRequest')
+			->setClass(Nette\Http\IRequest::class);
 
-		$builder->addDefinition($this->prefix('response'))
-			->setClass(Nette\Http\Response::class);
+		$response = $builder->addDefinition($this->prefix('response'))
+			->setFactory(Nette\Http\Response::class)
+			->setClass(Nette\Http\IResponse::class);
 
-		$builder->addDefinition($this->prefix('context'))
-			->setClass(Nette\Http\Context::class)
-			->addSetup('::trigger_error', ['Service http.context is deprecated.', E_USER_DEPRECATED]);
+		if (isset($config['cookieSecure'])) {
+			$value = $config['cookieSecure'] === 'auto'
+				? $builder::literal('$this->getService(?)->isSecured()', [$this->prefix('request')])
+				: (bool) $config['cookieSecure'];
+			$response->addSetup('$cookieSecure', [$value]);
+		}
 
 		if ($this->name === 'http') {
 			$builder->addAlias('nette.httpRequestFactory', $this->prefix('requestFactory'));
-			$builder->addAlias('nette.httpContext', $this->prefix('context'));
 			$builder->addAlias('httpRequest', $this->prefix('request'));
 			$builder->addAlias('httpResponse', $this->prefix('response'));
+
+			$builder->addDefinition($this->prefix('oldRequest'))
+				->setFactory($this->prefix('@request'))
+				->setClass(Nette\Http\Request::class)
+				->addSetup('::trigger_error', ['Service Nette\Http\Request should be autowired via interface Nette\Http\IRequest.', E_USER_DEPRECATED])
+				->setAutowired(Nette\Http\Request::class);
+
+			$builder->addDefinition($this->prefix('oldResponse'))
+				->setFactory($this->prefix('@response'))
+				->setClass(Nette\Http\Response::class)
+				->addSetup('::trigger_error', ['Service Nette\Http\Response should be autowired via interface Nette\Http\IResponse.', E_USER_DEPRECATED])
+				->setAutowired(Nette\Http\Response::class);
 		}
 	}
 
@@ -75,7 +95,7 @@ class HttpExtension extends Nette\DI\CompilerExtension
 		$config = $this->getConfig();
 		$headers = $config['headers'];
 
-		if (isset($config['frames']) && $config['frames'] !== true) {
+		if (isset($config['frames']) && $config['frames'] !== true && !isset($headers['X-Frame-Options'])) {
 			$frames = $config['frames'];
 			if ($frames === false) {
 				$frames = 'DENY';
@@ -85,25 +105,22 @@ class HttpExtension extends Nette\DI\CompilerExtension
 			$headers['X-Frame-Options'] = $frames;
 		}
 
-		foreach (['csp', 'csp-report'] as $key) {
+		foreach (['csp', 'cspReportOnly'] as $key) {
 			if (empty($config[$key])) {
 				continue;
 			}
-			$value = '';
-			foreach ($config[$key] as $type => $policy) {
-				$value .= $type;
-				foreach ((array) $policy as $item) {
-					$value .= preg_match('#^[a-z-]+\z#', $item) ? " '$item'" : " $item";
-				}
-				$value .= '; ';
-			}
+			$value = self::buildPolicy($config[$key]);
 			if (strpos($value, "'nonce'")) {
 				$value = Nette\DI\ContainerBuilder::literal(
-					'str_replace(?, ? . (isset($cspNonce) \? $cspNonce : $cspNonce = base64_encode(Nette\Utils\Random::generate(16, "\x00-\xFF"))), ?)',
+					'str_replace(?, ? . ($cspNonce = $cspNonce \?\? base64_encode(random_bytes(16))), ?)',
 					["'nonce", "'nonce-", $value]
 				);
 			}
 			$headers['Content-Security-Policy' . ($key === 'csp' ? '' : '-Report-Only')] = $value;
+		}
+
+		if (!empty($config['featurePolicy'])) {
+			$headers['Feature-Policy'] = self::buildPolicy($config['featurePolicy']);
 		}
 
 		foreach ($headers as $key => $value) {
@@ -111,5 +128,28 @@ class HttpExtension extends Nette\DI\CompilerExtension
 				$initialize->addBody('$this->getService(?)->setHeader(?, ?);', [$this->prefix('response'), $key, $value]);
 			}
 		}
+
+		if (!empty($config['sameSiteProtection'])) {
+			$initialize->addBody('$this->getService(?)->setCookie(...?);', [$this->prefix('response'), ['nette-samesite', '1', 0, '/', null, null, true, 'Strict']]);
+		}
+	}
+
+
+	private static function buildPolicy(array $config): string
+	{
+		static $nonQuoted = ['require-sri-for' => 1, 'sandbox' => 1];
+		$value = '';
+		foreach ($config as $type => $policy) {
+			if ($policy === false) {
+				continue;
+			}
+			$policy = $policy === true ? [] : (array) $policy;
+			$value .= $type;
+			foreach ($policy as $item) {
+				$value .= !isset($nonQuoted[$type]) && preg_match('#^[a-z-]+\z#', $item) ? " '$item'" : " $item";
+			}
+			$value .= '; ';
+		}
+		return $value;
 	}
 }

@@ -5,6 +5,8 @@
  * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
+declare(strict_types=1);
+
 namespace Nette\Application;
 
 use Nette;
@@ -16,20 +18,15 @@ use Nette;
 interface IRouter
 {
 	/** only matching route */
-	const ONE_WAY = 0b0001;
-
-	/** @deprecated */
-	const SECURED = 0b0010;
+	public const ONE_WAY = 0b0001;
 
 	/**
 	 * Maps HTTP request to a Request object.
-	 * @return Request|null
 	 */
-	function match(Nette\Http\IRequest $httpRequest);
+	function match(Nette\Http\IRequest $httpRequest): ?Request;
 
 	/**
 	 * Constructs absolute URL from Request object.
-	 * @return string|null
 	 */
-	function constructUrl(Request $appRequest, Nette\Http\Url $refUrl);
+	function constructUrl(Request $appRequest, Nette\Http\Url $refUrl): ?string;
 }

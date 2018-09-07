@@ -5,6 +5,8 @@
  * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
+declare(strict_types=1);
+
 namespace Nette\DI;
 
 use Nette;
@@ -15,7 +17,7 @@ use Nette;
  *
  * @property string|array|ServiceDefinition|null $entity
  */
-class Statement
+final class Statement
 {
 	use Nette\SmartObject;
 
@@ -27,7 +29,7 @@ class Statement
 
 
 	/**
-	 * @param  string|array|ServiceDefinition|null
+	 * @param  string|array|ServiceDefinition|null  $entity
 	 */
 	public function __construct($entity, array $arguments = [])
 	{
@@ -44,15 +46,7 @@ class Statement
 	}
 
 
-	/** @deprecated */
-	public function setEntity($entity)
-	{
-		trigger_error(__METHOD__ . ' is deprecated, change Statement object itself.', E_USER_DEPRECATED);
-		$this->__construct($entity, $this->arguments);
-		return $this;
-	}
-
-
+	/** @return string|array|ServiceDefinition|null */
 	public function getEntity()
 	{
 		return $this->entity;

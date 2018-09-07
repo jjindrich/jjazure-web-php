@@ -5,6 +5,8 @@
  * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
+declare(strict_types=1);
+
 namespace Nette\DI;
 
 use Nette;
@@ -16,15 +18,14 @@ use Nette\Utils\Reflection;
  * The DI helpers.
  * @internal
  */
-class Helpers
+final class Helpers
 {
 	use Nette\StaticClass;
 
 	/**
 	 * Expands %placeholders%.
-	 * @param  mixed
-	 * @param  array
-	 * @param  bool|array
+	 * @param  mixed  $var
+	 * @param  bool|array  $recursive
 	 * @return mixed
 	 * @throws Nette\InvalidArgumentException
 	 */
@@ -58,10 +59,15 @@ class Helpers
 				throw new Nette\InvalidArgumentException(sprintf('Circular reference detected for variables: %s.', implode(', ', array_keys($recursive))));
 
 			} else {
-				try {
-					$val = Nette\Utils\Arrays::get($params, explode('.', $part));
-				} catch (Nette\InvalidArgumentException $e) {
-					throw new Nette\InvalidArgumentException("Missing parameter '$part'.", 0, $e);
+				$val = $params;
+				foreach (explode('.', $part) as $key) {
+					if (is_array($val) && array_key_exists($key, $val)) {
+						$val = $val[$key];
+					} elseif ($val instanceof PhpLiteral) {
+						$val = new PhpLiteral($val . '[' . var_export($key, true) . ']');
+					} else {
+						throw new Nette\InvalidArgumentException("Missing parameter '$part'.");
+					}
 				}
 				if ($recursive) {
 					$val = self::expand($val, $params, (is_array($recursive) ? $recursive : []) + [$part => 1]);
@@ -88,10 +94,9 @@ class Helpers
 
 	/**
 	 * Generates list of arguments using autowiring.
-	 * @return array
 	 * @throws ServiceCreationException
 	 */
-	public static function autowireArguments(\ReflectionFunctionAbstract $method, array $arguments, $container)
+	public static function autowireArguments(\ReflectionFunctionAbstract $method, array $arguments, $container): array
 	{
 		$optCount = 0;
 		$num = -1;
@@ -158,9 +163,8 @@ class Helpers
 
 	/**
 	 * Removes ... and process constants recursively.
-	 * @return array
 	 */
-	public static function filterArguments(array $args)
+	public static function filterArguments(array $args): array
 	{
 		foreach ($args as $k => $v) {
 			if ($v === '...') {
@@ -180,11 +184,10 @@ class Helpers
 
 	/**
 	 * Replaces @extension with real extension name in service definition.
-	 * @param  mixed
-	 * @param  string
+	 * @param  mixed  $config
 	 * @return mixed
 	 */
-	public static function prefixServiceName($config, $namespace)
+	public static function prefixServiceName($config, string $namespace)
 	{
 		if (is_string($config)) {
 			if (strncmp($config, '@extension.', 10) === 0) {
@@ -206,24 +209,21 @@ class Helpers
 
 	/**
 	 * Returns an annotation value.
-	 * @return string|null
 	 */
-	public static function parseAnnotation(\Reflector $ref, $name)
+	public static function parseAnnotation(\Reflector $ref, string $name): ?string
 	{
 		if (!Reflection::areCommentsAvailable()) {
 			throw new Nette\InvalidStateException('You have to enable phpDoc comments in opcode cache.');
 		}
 		$name = preg_quote($name, '#');
 		if ($ref->getDocComment() && preg_match("#[\\s*]@$name(?:\\s++([^@]\\S*)?|$)#", trim($ref->getDocComment(), '/*'), $m)) {
-			return isset($m[1]) ? $m[1] : '';
+			return $m[1] ?? '';
 		}
+		return null;
 	}
 
 
-	/**
-	 * @return string|null
-	 */
-	public static function getReturnType(\ReflectionFunctionAbstract $func)
+	public static function getReturnType(\ReflectionFunctionAbstract $func): ?string
 	{
 		if ($type = Reflection::getReturnType($func)) {
 			return $type;
@@ -238,10 +238,11 @@ class Helpers
 				return $type;
 			}
 		}
+		return null;
 	}
 
 
-	public static function normalizeClass($type)
+	public static function normalizeClass(string $type): string
 	{
 		return class_exists($type) || interface_exists($type)
 			? (new \ReflectionClass($type))->getName()

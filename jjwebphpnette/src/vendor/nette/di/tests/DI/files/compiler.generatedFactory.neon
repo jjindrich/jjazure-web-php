@@ -1,0 +1,34 @@
+services:
+	ipsum: Ipsum
+	bar: Bar
+	baz: Baz
+
+	lorem: \ILoremFactory(Lorem)
+
+	finder: IFinderFactory
+
+	article:
+		factory: Article(%title%)
+		implement: IArticleFactory
+		parameters: [title]
+
+	article2:
+		implement: IArticleFactory
+		arguments: [%title%]
+		parameters: [title]
+
+	fooFactory1:
+		factory: Foo(..., %baz%)
+		implement: IFooFactory
+		parameters: [Baz baz = null]
+
+	fooFactory3:
+		type: Foo
+		implement: IFooFactory
+
+	fooFactory4: IFooFactory
+
+	factory5:
+		implement: ITestClassFactory
+		arguments: ['foo']
+	dolorFactory: DolorFactory

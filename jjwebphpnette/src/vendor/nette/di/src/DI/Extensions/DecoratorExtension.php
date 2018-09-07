@@ -5,6 +5,8 @@
  * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
+declare(strict_types=1);
+
 namespace Nette\DI\Extensions;
 
 use Nette;
@@ -13,7 +15,7 @@ use Nette;
 /**
  * Decorators for services.
  */
-class DecoratorExtension extends Nette\DI\CompilerExtension
+final class DecoratorExtension extends Nette\DI\CompilerExtension
 {
 	public $defaults = [
 		'setup' => [],
@@ -36,7 +38,7 @@ class DecoratorExtension extends Nette\DI\CompilerExtension
 	}
 
 
-	public function addSetups($type, array $setups)
+	public function addSetups(string $type, array $setups): void
 	{
 		foreach ($this->findByType($type) as $def) {
 			foreach ($setups as $setup) {
@@ -49,7 +51,7 @@ class DecoratorExtension extends Nette\DI\CompilerExtension
 	}
 
 
-	public function addTags($type, array $tags)
+	public function addTags(string $type, array $tags): void
 	{
 		$tags = Nette\Utils\Arrays::normalize($tags, true);
 		foreach ($this->findByType($type) as $def) {
@@ -58,7 +60,7 @@ class DecoratorExtension extends Nette\DI\CompilerExtension
 	}
 
 
-	private function findByType($type)
+	private function findByType(string $type): array
 	{
 		return array_filter($this->getContainerBuilder()->getDefinitions(), function ($def) use ($type) {
 			return is_a($def->getImplement(), $type, true)

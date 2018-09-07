@@ -5,6 +5,8 @@
  * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
+declare(strict_types=1);
+
 namespace Nette\Bridges\ApplicationDI;
 
 use Nette;
@@ -14,7 +16,7 @@ use Nette;
  * PresenterFactory callback.
  * @internal
  */
-class PresenterFactoryCallback
+final class PresenterFactoryCallback
 {
 	/** @var Nette\DI\Container */
 	private $container;
@@ -26,7 +28,7 @@ class PresenterFactoryCallback
 	private $touchToRefresh;
 
 
-	public function __construct(Nette\DI\Container $container, $invalidLinkMode, $touchToRefresh)
+	public function __construct(Nette\DI\Container $container, int $invalidLinkMode, ?string $touchToRefresh)
 	{
 		$this->container = $container;
 		$this->invalidLinkMode = $invalidLinkMode;
@@ -34,10 +36,7 @@ class PresenterFactoryCallback
 	}
 
 
-	/**
-	 * @return Nette\Application\IPresenter
-	 */
-	public function __invoke($class)
+	public function __invoke(string $class): Nette\Application\IPresenter
 	{
 		$services = array_keys($this->container->findByTag('nette.presenter'), $class, true);
 		if (count($services) > 1) {

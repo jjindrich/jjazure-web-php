@@ -5,6 +5,8 @@
  * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
+declare(strict_types=1);
+
 namespace Nette\Application\Routers;
 
 use Nette;
@@ -14,13 +16,13 @@ use Nette\Application;
 /**
  * The bidirectional route for trivial routing via query parameters.
  */
-class SimpleRouter implements Application\IRouter
+final class SimpleRouter implements Application\IRouter
 {
 	use Nette\SmartObject;
 
-	const PRESENTER_KEY = 'presenter';
-
-	const MODULE_KEY = 'module';
+	public const
+		PRESENTER_KEY = 'presenter',
+		MODULE_KEY = 'module';
 
 	/** @var string */
 	private $module = '';
@@ -32,14 +34,10 @@ class SimpleRouter implements Application\IRouter
 	private $flags;
 
 
-	/**
-	 * @param  array   default values
-	 * @param  int     flags
-	 */
-	public function __construct($defaults = [], $flags = 0)
+	public function __construct($defaults = [], int $flags = 0)
 	{
 		if (is_string($defaults)) {
-			list($presenter, $action) = Nette\Application\Helpers::splitName($defaults);
+			[$presenter, $action] = Nette\Application\Helpers::splitName($defaults);
 			if (!$presenter) {
 				throw new Nette\InvalidArgumentException("Argument must be array or string in format Presenter:action, '$defaults' given.");
 			}
@@ -56,17 +54,13 @@ class SimpleRouter implements Application\IRouter
 
 		$this->defaults = $defaults;
 		$this->flags = $flags;
-		if ($flags & self::SECURED) {
-			trigger_error('IRouter::SECURED is deprecated, router by default keeps the used protocol.', E_USER_DEPRECATED);
-		}
 	}
 
 
 	/**
 	 * Maps HTTP request to a Request object.
-	 * @return Nette\Application\Request|null
 	 */
-	public function match(Nette\Http\IRequest $httpRequest)
+	public function match(Nette\Http\IRequest $httpRequest): ?Application\Request
 	{
 		if ($httpRequest->getUrl()->getPathInfo() !== '') {
 			return null;
@@ -95,9 +89,8 @@ class SimpleRouter implements Application\IRouter
 
 	/**
 	 * Constructs absolute URL from Request object.
-	 * @return string|null
 	 */
-	public function constructUrl(Application\Request $appRequest, Nette\Http\Url $refUrl)
+	public function constructUrl(Application\Request $appRequest, Nette\Http\Url $refUrl): ?string
 	{
 		if ($this->flags & self::ONE_WAY) {
 			return null;
@@ -119,7 +112,7 @@ class SimpleRouter implements Application\IRouter
 			}
 		}
 
-		$url = ($this->flags & self::SECURED ? 'https://' : $refUrl->getScheme() . '://') . $refUrl->getAuthority() . $refUrl->getPath();
+		$url = $refUrl->getScheme() . '://' . $refUrl->getAuthority() . $refUrl->getPath();
 		$sep = ini_get('arg_separator.input');
 		$query = http_build_query($params, '', $sep ? $sep[0] : '&');
 		if ($query != '') { // intentionally ==
@@ -131,9 +124,8 @@ class SimpleRouter implements Application\IRouter
 
 	/**
 	 * Returns default values.
-	 * @return array
 	 */
-	public function getDefaults()
+	public function getDefaults(): array
 	{
 		return $this->defaults;
 	}
@@ -141,9 +133,8 @@ class SimpleRouter implements Application\IRouter
 
 	/**
 	 * Returns flags.
-	 * @return int
 	 */
-	public function getFlags()
+	public function getFlags(): int
 	{
 		return $this->flags;
 	}

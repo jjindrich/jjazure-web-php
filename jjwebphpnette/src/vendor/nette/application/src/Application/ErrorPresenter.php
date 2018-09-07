@@ -5,6 +5,8 @@
  * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
+declare(strict_types=1);
+
 namespace NetteModule;
 
 use Nette;
@@ -16,7 +18,7 @@ use Tracy\ILogger;
 /**
  * Default Error Presenter.
  */
-class ErrorPresenter implements Application\IPresenter
+final class ErrorPresenter implements Application\IPresenter
 {
 	use Nette\SmartObject;
 
@@ -30,10 +32,7 @@ class ErrorPresenter implements Application\IPresenter
 	}
 
 
-	/**
-	 * @return Application\IResponse
-	 */
-	public function run(Application\Request $request)
+	public function run(Application\Request $request): Application\IResponse
 	{
 		$e = $request->getParameter('exception');
 		if ($e instanceof Application\BadRequestException) {

@@ -1,0 +1,113 @@
+<?php
+%A%
+
+class Template%a% extends Latte\Runtime\Template
+{
+	public $contentType = 'xml';
+
+
+	function main()
+	{
+		extract($this->params);
+		if (empty($this->global->coreCaptured) && in_array($this->getReferenceType(), ["extends", null], true)) header('Content-Type: application/xml; charset=utf-8');
+		?><<?php ?>?xml version="1.0" encoding="utf-8"?>
+<<?php ?>?xml-stylesheet type="text/css" href="<?php echo LR\Filters::escapeXml($id) /* line 3 */ ?>"?>
+
+<script><?php
+		if (1) {
+			?><meta /><?php
+		}
+?>
+</script>
+
+
+<ul>
+	<li>Escaped: <?php echo LR\Filters::escapeXml($hello) /* line 9 */ ?></li>
+	<li>Non-escaped: <?php echo $hello /* line 10 */ ?></li>
+	<li>Escaped expression: <?php echo LR\Filters::escapeXml('<' . 'b' . '>hello' . '</b>') /* line 11 */ ?></li>
+	<li>Non-escaped expression: <?php echo '<' . 'b' . '>hello' . '</b>' /* line 12 */ ?></li>
+	<li>Array access: <?php echo LR\Filters::escapeXml($people[1]) /* line 13 */ ?></li>
+	<li>Html: <?php echo LR\Filters::escapeXml($el) /* line 14 */ ?></li>
+</ul>
+
+<style type="text/css">
+<!--
+#<?php echo LR\Filters::escapeHtmlComment($id) /* line 19 */ ?> {
+	background: blue;
+}
+-->
+</style>
+
+
+<script>
+<!--
+var html = <?php echo LR\Filters::escapeHtmlComment($el) /* line 28 */ ?>;
+-->
+</script>
+
+
+<p onclick =
+'alert(<?php echo LR\Filters::escapeXml($id) /* line 34 */ ?>);alert("hello");'
+ title='<?php echo LR\Filters::escapeXml($id) /* line 35 */ ?>"'
+ style =
+ "color:<?php echo LR\Filters::escapeXml($id) /* line 37 */ ?>;'"
+ alt='<?php echo LR\Filters::escapeXml($el) /* line 38 */ ?>'
+ onfocus="alert(<?php echo LR\Filters::escapeXml($el) /* line 39 */ ?>)"
+>click on me</p>
+
+
+<!-- <?php echo LR\Filters::escapeHtmlComment($comment) /* line 43 */ ?> -->
+
+
+</ul>
+
+
+<ul>
+<?php
+		$iterations = 0;
+		foreach ($people as $person) {
+			?>	<li><?php echo LR\Filters::escapeXml($person) /* line 50 */ ?></li>
+<?php
+			$iterations++;
+		}
+?>
+</ul>
+
+<?php
+		if (true) {
+?><p>
+	<div><p>true</div>
+</p>
+<?php
+		}
+?>
+
+<input/> <input />
+
+<p val = <?php
+		if (true) {
+			?>"a"<?php
+		}
+		else {
+			?>"b"<?php
+		}
+?>> </p>
+
+<p val = <?php echo LR\Filters::escapeXmlAttrUnquoted($xss) /* line 61 */ ?> val2=<?php echo LR\Filters::escapeXmlAttrUnquoted($mxss) /* line 61 */ ?>> </p>
+
+<p onclick = <?php echo LR\Filters::escapeXmlAttrUnquoted($xss) /* line 63 */ ?>> </p>
+
+<p val = /><?php echo LR\Filters::escapeXml($xss) /* line 65 */ ?></p>
+<?php
+		return get_defined_vars();
+	}
+
+
+	function prepare()
+	{
+		extract($this->params);
+		if (isset($this->params['person'])) trigger_error('Variable $person overwritten in foreach on line 50');
+
+	}
+
+}

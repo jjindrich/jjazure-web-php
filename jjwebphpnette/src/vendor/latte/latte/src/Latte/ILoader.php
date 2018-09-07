@@ -5,6 +5,8 @@
  * Copyright (c) 2008 David Grudl (https://davidgrudl.com)
  */
 
+declare(strict_types=1);
+
 namespace Latte;
 
 
@@ -16,25 +18,21 @@ interface ILoader
 
 	/**
 	 * Returns template source code.
-	 * @return string
 	 */
-	function getContent($name);
+	function getContent(string $name): string;
 
 	/**
 	 * Checks whether template is expired.
-	 * @return bool
 	 */
-	function isExpired($name, $time);
+	function isExpired(string $name, int $time): bool;
 
 	/**
 	 * Returns referred template name.
-	 * @return string
 	 */
-	function getReferredName($name, $referringName);
+	function getReferredName(string $name, string $referringName): string;
 
 	/**
 	 * Returns unique identifier for caching.
-	 * @return string
 	 */
-	function getUniqueId($name);
+	function getUniqueId(string $name): string;
 }

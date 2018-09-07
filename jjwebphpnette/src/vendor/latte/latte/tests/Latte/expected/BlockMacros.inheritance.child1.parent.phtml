@@ -1,0 +1,75 @@
+<?php
+%A%
+
+class Template%a% extends Latte\Runtime\Template
+{
+	public $blocks = [
+		'title' => 'blockTitle',
+		'sidebar' => 'blockSidebar',
+	];
+
+	public $blockTypes = [
+		'title' => 'html',
+		'sidebar' => 'html',
+	];
+
+
+	function main()
+	{
+		extract($this->params);
+		extract(['class' => NULL, 'namespace' => NULL, 'top' => TRUE], EXTR_SKIP) ?>
+<!DOCTYPE html>
+<head>
+	<title><?php
+		if ($this->getParentName()) return get_defined_vars();
+		$this->renderBlock('title', get_defined_vars(), function ($s, $type) {
+			$_fi = new LR\FilterInfo($type);
+			return LR\Filters::convertTo($_fi, 'html', $this->filters->filterContent('upper', $_fi, $this->filters->filterContent('striphtml', $_fi, $s)));
+		});
+?></title>
+</head>
+
+<body>
+	<div id="sidebar">
+<?php
+		$this->renderBlock('sidebar', get_defined_vars());
+?>
+	</div>
+
+	<div id="content">
+<?php
+		$this->renderBlock('content', $this->params, 'html');
+?>
+
+<?php
+		$this->renderBlock('content', $this->params, function ($s, $type) {
+			$_fi = new LR\FilterInfo($type);
+			return LR\Filters::convertTo($_fi, 'html', $this->filters->filterContent('upper', $_fi, $this->filters->filterContent('striphtml', $_fi, $s)));
+		});
+?>
+	</div>
+</body>
+</html>
+Parent: <?php echo LR\Filters::escapeHtmlText(basename($this->getReferringTemplate()->getName())) /* line 23 */ ?>/<?php
+		echo LR\Filters::escapeHtmlText($this->getReferenceType()) /* line 23 */ ?>
+
+<?php
+		return get_defined_vars();
+	}
+
+
+	function blockTitle($_args)
+	{
+		?>My website<?php
+	}
+
+
+	function blockSidebar($_args)
+	{
+?>		<ul>
+			<li><a href="/">Homepage</a></li>
+		</ul>
+<?php
+	}
+
+}

@@ -1,22 +1,31 @@
 <?php
 
-require __DIR__ . '/../vendor/autoload.php';
+declare(strict_types=1);
 
+use Nette\Application\Routers\SimpleRouter;
+
+
+// Load Nette Framework
+if (@!include __DIR__ . '/../vendor/autoload.php') {
+	die('Install Nette using `composer update`');
+}
+
+// Configure application
 $configurator = new Nette\Configurator;
 
-//$configurator->setDebugMode('23.75.345.200'); // enable for your remote IP
+// Enable Tracy for error visualisation & logging
 $configurator->enableTracy(__DIR__ . '/../log');
 
-$configurator->setTimeZone('Europe/Prague');
+// Enable RobotLoader - this will load all classes automatically
 $configurator->setTempDirectory(__DIR__ . '/../temp');
-
 $configurator->createRobotLoader()
 	->addDirectory(__DIR__)
 	->register();
 
-$configurator->addConfig(__DIR__ . '/config/config.neon');
-$configurator->addConfig(__DIR__ . '/config/config.local.neon');
-
+// Create default Dependency Injection container
 $container = $configurator->createContainer();
+
+// Setup router
+$container->addService('router', new SimpleRouter('Default:default'));
 
 return $container;

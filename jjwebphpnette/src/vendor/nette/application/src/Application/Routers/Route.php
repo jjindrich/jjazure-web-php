@@ -5,6 +5,8 @@
  * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
+declare(strict_types=1);
+
 namespace Nette\Application\Routers;
 
 use Nette;
@@ -20,35 +22,30 @@ class Route implements Application\IRouter
 {
 	use Nette\SmartObject;
 
-	const PRESENTER_KEY = 'presenter';
+	public const
+		PRESENTER_KEY = 'presenter',
+		MODULE_KEY = 'module';
 
-	const MODULE_KEY = 'module';
+	/** key used in {@link Route::$styles} or metadata {@link Route::__construct} */
+	public const
+		VALUE = 'value',
+		PATTERN = 'pattern',
+		FILTER_IN = 'filterIn',
+		FILTER_OUT = 'filterOut',
+		FILTER_TABLE = 'filterTable',
+		FILTER_STRICT = 'filterStrict';
 
-	/** @internal url type */
-	const HOST = 1,
+	/** url type */
+	private const
+		HOST = 1,
 		PATH = 2,
 		RELATIVE = 3;
 
-	/** key used in {@link Route::$styles} or metadata {@link Route::__construct} */
-	const VALUE = 'value';
-
-	const PATTERN = 'pattern';
-
-	const FILTER_IN = 'filterIn';
-
-	const FILTER_OUT = 'filterOut';
-
-	const FILTER_TABLE = 'filterTable';
-
-	const FILTER_STRICT = 'filterStrict';
-
-	/** @internal fixity types - how to handle default value? {@link Route::$metadata} */
-	const OPTIONAL = 0,
+	/** fixity types - how to handle default value? {@link Route::$metadata} */
+	private const
+		OPTIONAL = 0,
 		PATH_OPTIONAL = 1,
 		CONSTANT = 2;
-
-	/** @deprecated */
-	public static $defaultFlags = 0;
 
 	/** @var array */
 	public static $styles = [
@@ -116,14 +113,13 @@ class Route implements Application\IRouter
 
 
 	/**
-	 * @param  string  URL mask, e.g. '<presenter>/<action>/<id \d{1,3}>'
-	 * @param  array|string|\Closure  default values or metadata or callback for NetteModule\MicroPresenter
-	 * @param  int     flags
+	 * @param  string  $mask  e.g. '<presenter>/<action>/<id \d{1,3}>'
+	 * @param  array|string|\Closure  $metadata  default values or metadata or callback for NetteModule\MicroPresenter
 	 */
-	public function __construct($mask, $metadata = [], $flags = 0)
+	public function __construct(string $mask, $metadata = [], int $flags = 0)
 	{
 		if (is_string($metadata)) {
-			list($presenter, $action) = Nette\Application\Helpers::splitName($metadata);
+			[$presenter, $action] = Nette\Application\Helpers::splitName($metadata);
 			if (!$presenter) {
 				throw new Nette\InvalidArgumentException("Second argument must be array or string in format Presenter:action, '$metadata' given.");
 			}
@@ -131,32 +127,22 @@ class Route implements Application\IRouter
 			if ($action !== '') {
 				$metadata['action'] = $action;
 			}
-		} elseif ($metadata instanceof \Closure || $metadata instanceof Nette\Callback) {
-			if ($metadata instanceof Nette\Callback) {
-				trigger_error('Nette\Callback is deprecated, use Nette\Utils\Callback::closure().', E_USER_DEPRECATED);
-			}
+		} elseif ($metadata instanceof \Closure) {
 			$metadata = [
 				self::PRESENTER_KEY => 'Nette:Micro',
 				'callback' => $metadata,
 			];
 		}
 
-		$this->flags = $flags | static::$defaultFlags;
+		$this->flags = $flags;
 		$this->setMask($mask, $metadata);
-		if (static::$defaultFlags) {
-			trigger_error('Route::$defaultFlags is deprecated, router by default keeps the used protocol.', E_USER_DEPRECATED);
-		} elseif ($flags & self::SECURED) {
-			trigger_error('Router::SECURED is deprecated, specify scheme in mask.', E_USER_DEPRECATED);
-			$this->scheme = 'https';
-		}
 	}
 
 
 	/**
 	 * Maps HTTP request to a Request object.
-	 * @return Nette\Application\Request|null
 	 */
-	public function match(Nette\Http\IRequest $httpRequest)
+	public function match(Nette\Http\IRequest $httpRequest): ?Application\Request
 	{
 		// combine with precedence: mask (params in URL-path), fixity, query, (post,) defaults
 
@@ -172,7 +158,7 @@ class Route implements Application\IRouter
 				'/%basePath%/' => preg_quote($url->getBasePath(), '#'),
 				'%tld%' => preg_quote($parts[0], '#'),
 				'%domain%' => preg_quote(isset($parts[1]) ? "$parts[1].$parts[0]" : $parts[0], '#'),
-				'%sld%' => preg_quote(isset($parts[1]) ? $parts[1] : '', '#'),
+				'%sld%' => preg_quote($parts[1] ?? '', '#'),
 				'%host%' => preg_quote($host, '#'),
 			]);
 
@@ -181,7 +167,7 @@ class Route implements Application\IRouter
 			if (strncmp($url->getPath(), $basePath, strlen($basePath)) !== 0) {
 				return null;
 			}
-			$path = (string) substr($url->getPath(), strlen($basePath));
+			$path = substr($url->getPath(), strlen($basePath));
 
 		} else {
 			$path = $url->getPath();
@@ -233,7 +219,7 @@ class Route implements Application\IRouter
 					return null; // rejected by filterTable
 
 				} elseif (isset($meta[self::FILTER_IN])) { // applies filterIn only to scalar parameters
-					$params[$name] = call_user_func($meta[self::FILTER_IN], (string) $params[$name]);
+					$params[$name] = $meta[self::FILTER_IN]((string) $params[$name]);
 					if ($params[$name] === null && !isset($meta['fixity'])) {
 						return null; // rejected by filter
 					}
@@ -245,7 +231,7 @@ class Route implements Application\IRouter
 		}
 
 		if (isset($this->metadata[null][self::FILTER_IN])) {
-			$params = call_user_func($this->metadata[null][self::FILTER_IN], $params);
+			$params = $this->metadata[null][self::FILTER_IN]($params);
 			if ($params === null) {
 				return null;
 			}
@@ -278,9 +264,8 @@ class Route implements Application\IRouter
 
 	/**
 	 * Constructs absolute URL from Request object.
-	 * @return string|null
 	 */
-	public function constructUrl(Application\Request $appRequest, Nette\Http\Url $refUrl)
+	public function constructUrl(Application\Request $appRequest, Nette\Http\Url $refUrl): ?string
 	{
 		if ($this->flags & self::ONE_WAY) {
 			return null;
@@ -294,7 +279,7 @@ class Route implements Application\IRouter
 
 		if (isset($metadata[self::MODULE_KEY])) { // try split into module and [submodule:]presenter parts
 			$module = $metadata[self::MODULE_KEY];
-			if (isset($module['fixity']) && strncmp($presenter, $module[self::VALUE] . ':', strlen($module[self::VALUE]) + 1) === 0) {
+			if (isset($module['fixity'], $module[self::VALUE]) && strncmp($presenter, $module[self::VALUE] . ':', strlen($module[self::VALUE]) + 1) === 0) {
 				$a = strlen($module[self::VALUE]);
 			} else {
 				$a = strrpos($presenter, ':');
@@ -308,7 +293,7 @@ class Route implements Application\IRouter
 		}
 
 		if (isset($metadata[null][self::FILTER_OUT])) {
-			$params = call_user_func($metadata[null][self::FILTER_OUT], $params);
+			$params = $metadata[null][self::FILTER_OUT]($params);
 			if ($params === null) {
 				return null;
 			}
@@ -340,10 +325,10 @@ class Route implements Application\IRouter
 				return null;
 
 			} elseif (isset($meta[self::FILTER_OUT])) {
-				$params[$name] = call_user_func($meta[self::FILTER_OUT], $params[$name]);
+				$params[$name] = $meta[self::FILTER_OUT]($params[$name]);
 			}
 
-			if (isset($meta[self::PATTERN]) && !preg_match($meta[self::PATTERN], rawurldecode($params[$name]))) {
+			if (isset($meta[self::PATTERN]) && !preg_match($meta[self::PATTERN], rawurldecode((string) $params[$name]))) {
 				return null; // pattern not match
 			}
 		}
@@ -405,7 +390,7 @@ class Route implements Application\IRouter
 				'/%basePath%/' => $refUrl->getBasePath(),
 				'%tld%' => $parts[0],
 				'%domain%' => isset($parts[1]) ? "$parts[1].$parts[0]" : $parts[0],
-				'%sld%' => isset($parts[1]) ? $parts[1] : '',
+				'%sld%' => $parts[1] ?? '',
 				'%host%' => $host,
 			]);
 			$url = $scheme . ':' . $url;
@@ -439,18 +424,15 @@ class Route implements Application\IRouter
 
 	/**
 	 * Parse mask and array of default values; initializes object.
-	 * @param  string
-	 * @param  array
-	 * @return void
 	 */
-	private function setMask($mask, array $metadata)
+	private function setMask(string $mask, array $metadata): void
 	{
 		$this->mask = $mask;
 
 		// detect '//host/path' vs. '/abs. path' vs. 'relative path'
 		if (preg_match('#(?:(https?):)?(//.*)#A', $mask, $m)) {
 			$this->type = self::HOST;
-			list(, $this->scheme, $mask) = $m;
+			[, $this->scheme, $mask] = $m;
 
 		} elseif (substr($mask, 0, 1) === '/') {
 			$this->type = self::PATH;
@@ -491,16 +473,8 @@ class Route implements Application\IRouter
 			// name=<parameter-name [pattern]>
 			$matches = Strings::matchAll($parts[$i - 1], '/(?:([a-zA-Z0-9_.-]+)=)?<([^> ]+) *([^>]*)>/');
 
-			foreach ($matches as list(, $param, $name, $pattern)) { // $pattern is not used
-				if (isset(static::$styles['?' . $name])) {
-					$meta = static::$styles['?' . $name];
-				} else {
-					$meta = static::$styles['?#'];
-				}
-
-				if (isset($metadata[$name])) {
-					$meta = $metadata[$name] + $meta;
-				}
+			foreach ($matches as [, $param, $name, $pattern]) { // $pattern is not used
+				$meta = ($metadata[$name] ?? []) + (static::$styles['?' . $name] ?? static::$styles['?#']);
 
 				if (array_key_exists(self::VALUE, $meta)) {
 					$meta['fixity'] = self::OPTIONAL;
@@ -560,22 +534,14 @@ class Route implements Application\IRouter
 			}
 
 			// pattern, condition & metadata
-			if (isset(static::$styles[$name])) {
-				$meta = static::$styles[$name];
-			} else {
-				$meta = static::$styles['#'];
-			}
-
-			if (isset($metadata[$name])) {
-				$meta = $metadata[$name] + $meta;
-			}
+			$meta = ($metadata[$name] ?? []) + (static::$styles[$name] ?? static::$styles['#']);
 
 			if ($pattern == '' && isset($meta[self::PATTERN])) {
 				$pattern = $meta[self::PATTERN];
 			}
 
 			if ($default !== '') {
-				$meta[self::VALUE] = (string) substr($default, 1);
+				$meta[self::VALUE] = substr($default, 1);
 				$meta['fixity'] = self::PATH_OPTIONAL;
 			}
 
@@ -584,8 +550,8 @@ class Route implements Application\IRouter
 				if (isset($meta['filterTable2'][$meta[self::VALUE]])) {
 					$meta['defOut'] = $meta['filterTable2'][$meta[self::VALUE]];
 
-				} elseif (isset($meta[self::FILTER_OUT])) {
-					$meta['defOut'] = call_user_func($meta[self::FILTER_OUT], $meta[self::VALUE]);
+				} elseif (isset($meta[self::VALUE], $meta[self::FILTER_OUT])) {
+					$meta['defOut'] = $meta[self::FILTER_OUT]($meta[self::VALUE]);
 
 				} else {
 					$meta['defOut'] = $meta[self::VALUE];
@@ -628,9 +594,8 @@ class Route implements Application\IRouter
 
 	/**
 	 * Returns mask.
-	 * @return string
 	 */
-	public function getMask()
+	public function getMask(): string
 	{
 		return $this->mask;
 	}
@@ -638,9 +603,8 @@ class Route implements Application\IRouter
 
 	/**
 	 * Returns default values.
-	 * @return array
 	 */
-	public function getDefaults()
+	public function getDefaults(): array
 	{
 		$defaults = [];
 		foreach ($this->metadata as $name => $meta) {
@@ -654,9 +618,8 @@ class Route implements Application\IRouter
 
 	/**
 	 * Returns flags.
-	 * @return int
 	 */
-	public function getFlags()
+	public function getFlags(): int
 	{
 		return $this->flags;
 	}
@@ -670,7 +633,7 @@ class Route implements Application\IRouter
 	 * @internal
 	 * @return string[]|null
 	 */
-	public function getTargetPresenters()
+	public function getTargetPresenters(): ?array
 	{
 		if ($this->flags & self::ONE_WAY) {
 			return [];
@@ -680,14 +643,14 @@ class Route implements Application\IRouter
 		$module = '';
 
 		if (isset($m[self::MODULE_KEY])) {
-			if (isset($m[self::MODULE_KEY]['fixity']) && $m[self::MODULE_KEY]['fixity'] === self::CONSTANT) {
+			if (($m[self::MODULE_KEY]['fixity'] ?? null) === self::CONSTANT) {
 				$module = $m[self::MODULE_KEY][self::VALUE] . ':';
 			} else {
 				return null;
 			}
 		}
 
-		if (isset($m[self::PRESENTER_KEY]['fixity']) && $m[self::PRESENTER_KEY]['fixity'] === self::CONSTANT) {
+		if (($m[self::PRESENTER_KEY]['fixity'] ?? null) === self::CONSTANT) {
 			return [$module . $m[self::PRESENTER_KEY][self::VALUE]];
 		}
 		return null;
@@ -696,11 +659,8 @@ class Route implements Application\IRouter
 
 	/**
 	 * Rename keys in array.
-	 * @param  array
-	 * @param  array
-	 * @return array
 	 */
-	private static function renameKeys($arr, $xlat)
+	private static function renameKeys(array $arr, array $xlat): array
 	{
 		if (empty($xlat)) {
 			return $arr;
@@ -725,10 +685,8 @@ class Route implements Application\IRouter
 
 	/**
 	 * camelCaseAction name -> dash-separated.
-	 * @param  string
-	 * @return string
 	 */
-	public static function action2path($s)
+	public static function action2path(string $s): string
 	{
 		$s = preg_replace('#(.)(?=[A-Z])#', '$1-', $s);
 		$s = strtolower($s);
@@ -739,10 +697,8 @@ class Route implements Application\IRouter
 
 	/**
 	 * dash-separated -> camelCaseAction name.
-	 * @param  string
-	 * @return string
 	 */
-	public static function path2action($s)
+	public static function path2action(string $s): string
 	{
 		$s = preg_replace('#-(?=[a-z])#', ' ', $s);
 		$s = lcfirst(ucwords($s));
@@ -753,10 +709,8 @@ class Route implements Application\IRouter
 
 	/**
 	 * PascalCase:Presenter name -> dash-and-dot-separated.
-	 * @param  string
-	 * @return string
 	 */
-	public static function presenter2path($s)
+	public static function presenter2path(string $s): string
 	{
 		$s = strtr($s, ':', '.');
 		$s = preg_replace('#([^.])(?=[A-Z])#', '$1-', $s);
@@ -768,10 +722,8 @@ class Route implements Application\IRouter
 
 	/**
 	 * dash-and-dot-separated -> PascalCase:Presenter name.
-	 * @param  string
-	 * @return string
 	 */
-	public static function path2presenter($s)
+	public static function path2presenter(string $s): string
 	{
 		$s = preg_replace('#([.-])(?=[a-z])#', '$1 ', $s);
 		$s = ucwords($s);
@@ -783,10 +735,8 @@ class Route implements Application\IRouter
 
 	/**
 	 * Url encode.
-	 * @param  string
-	 * @return string
 	 */
-	public static function param2path($s)
+	public static function param2path(string $s): string
 	{
 		return str_replace('%2F', '/', rawurlencode($s));
 	}

@@ -1,0 +1,45 @@
+/**
+ * Description of class.
+ * This is example
+ *
+ * @property-read Nette\Forms\Form $form
+ */
+abstract class Example extends ParentClass implements IExample, IOne
+{
+	use ObjectTrait;
+	use AnotherTrait {
+		sayHello as protected;
+	}
+
+	const ROLE = 'admin';
+	const ACTIVE = false;
+	/** Commented */
+	private const FORCE_ARRAY = Nette\Utils\Json::FORCE_ARRAY;
+
+	/** @var resource  orignal file handle */
+	private $handle;
+
+	public $order = RecursiveIteratorIterator::SELF_FIRST;
+
+	public static $sections = ['first' => true];
+
+
+	/**
+	 * Returns file handle.
+	 * @return resource
+	 */
+	final public function getHandle()
+	{
+		return $this->handle;
+	}
+
+
+	protected static function &getSections($mode = self::ORDER)
+	{
+		$mode = 123;
+		return self::$sections;
+	}
+
+
+	abstract public function show($item, array &$res = null);
+}

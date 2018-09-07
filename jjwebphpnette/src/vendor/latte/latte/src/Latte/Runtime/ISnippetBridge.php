@@ -5,6 +5,8 @@
  * Copyright (c) 2008 David Grudl (https://davidgrudl.com)
  */
 
+declare(strict_types=1);
+
 namespace Latte\Runtime;
 
 
@@ -14,45 +16,17 @@ namespace Latte\Runtime;
  */
 interface ISnippetBridge
 {
+	function isSnippetMode(): bool;
 
-	/**
-	 * @return bool
-	 */
-	function isSnippetMode();
+	function setSnippetMode(bool $snippetMode);
 
-	/**
-	 * @param  bool
-	 * @return void
-	 */
-	function setSnippetMode($snippetMode);
+	function needsRedraw(string $name): bool;
 
-	/**
-	 * @param  string
-	 * @return bool
-	 */
-	function needsRedraw($name);
+	function markRedrawn(string $name): void;
 
-	/**
-	 * @param  string
-	 * @return void
-	 */
-	function markRedrawn($name);
+	function getHtmlId(string $name): string;
 
-	/**
-	 * @param  string
-	 * @return string
-	 */
-	function getHtmlId($name);
+	function addSnippet(string $name, string $content): void;
 
-	/**
-	 * @param  string
-	 * @param  string
-	 * @return mixed
-	 */
-	function addSnippet($name, $content);
-
-	/**
-	 * @return void
-	 */
-	function renderChildren();
+	function renderChildren(): void;
 }

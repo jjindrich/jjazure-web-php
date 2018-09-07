@@ -1,0 +1,75 @@
+<?php
+%A%
+
+class Template%a% extends Latte\Runtime\Template
+{
+	public $blocks = [
+		'content' => 'blockContent',
+		'title' => 'blockTitle',
+		'sidebar' => 'blockSidebar',
+	];
+
+	public $blockTypes = [
+		'content' => 'html',
+		'title' => 'html',
+		'sidebar' => 'html',
+	];
+
+
+	function main()
+	{
+%A%
+<?php
+		if ($this->getParentName()) return get_defined_vars();
+		$this->renderBlock('content', get_defined_vars());
+?>
+
+<?php
+		$this->renderBlock('sidebar', get_defined_vars());
+		?>	<?php
+%A%
+	}
+
+
+	function prepare()
+	{
+		extract($this->params);
+		if (isset($this->params['person'])) trigger_error('Variable $person overwritten in foreach on line 8');
+		$this->parentName = "parent";
+
+	}
+
+
+	function blockContent($_args)
+	{
+		extract($_args);
+		?>	<h1><?php
+		$this->renderBlock('title', get_defined_vars());
+?></h1>
+
+	<ul>
+<?php
+		$iterations = 0;
+		foreach ($people as $person) {
+			?>		<li><?php echo LR\Filters::escapeHtmlText($person) /* line 9 */ ?></li>
+<?php
+			$iterations++;
+		}
+?>
+	</ul>
+<?php
+	}
+
+
+	function blockTitle($_args)
+	{
+		?>Homepage <?php
+	}
+
+
+	function blockSidebar($_args)
+	{
+
+	}
+
+}

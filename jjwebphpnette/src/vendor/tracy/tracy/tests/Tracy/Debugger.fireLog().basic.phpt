@@ -1,0 +1,35 @@
+<?php
+
+/**
+ * Test: Tracy\Debugger::fireLog()
+ */
+
+use Tester\Assert;
+use Tracy\Debugger;
+
+
+require __DIR__ . '/../bootstrap.php';
+
+if (PHP_SAPI === 'cli') {
+	Tester\Environment::skip('FireLogger is not available in CLI mode');
+}
+
+
+// Setup environment
+$_SERVER['HTTP_X_FIRELOGGER'] = true;
+
+Debugger::$productionMode = false;
+
+
+$arr = [10, 20.2, true, false, null, 'hello', ['key1' => 'val1', 'key2' => true], (object) ['key1' => 'val1', 'key2' => true]];
+
+// will show in FireLogger
+Debugger::fireLog('Hello World'); // Tracy\Debugger::DEBUG
+Debugger::fireLog('Info message', Debugger::INFO);
+Debugger::fireLog('Warn message', Debugger::WARNING);
+Debugger::fireLog('Error message', Debugger::ERROR);
+Debugger::fireLog($arr);
+
+Assert::match('%A%
+FireLogger-de11e-0:%a%
+', implode("\r\n", headers_list()));

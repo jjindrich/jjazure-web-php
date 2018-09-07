@@ -5,6 +5,8 @@
  * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
+declare(strict_types=1);
+
 namespace Nette\Bridges\ApplicationLatte;
 
 use Latte;
@@ -52,10 +54,7 @@ class TemplateFactory implements UI\ITemplateFactory
 	}
 
 
-	/**
-	 * @return Template
-	 */
-	public function createTemplate(UI\Control $control = null)
+	public function createTemplate(UI\Control $control = null): UI\ITemplate
 	{
 		$latte = $this->latteFactory->create();
 		$template = new $this->templateClass($latte);
@@ -82,11 +81,19 @@ class TemplateFactory implements UI\ITemplateFactory
 			}
 		});
 
-		$latte->addFilter('url', 'rawurlencode'); // back compatiblity
-		foreach (['normalize', 'toAscii', 'webalize', 'reverse'] as $name) {
-			$latte->addFilter($name, 'Nette\Utils\Strings::' . $name);
+		$latte->addFilter('url', function ($s) {
+			trigger_error('Filter |url is deprecated, use |escapeUrl.', E_USER_DEPRECATED);
+			return rawurlencode($s);
+		});
+		foreach (['normalize', 'toAscii'] as $name) {
+			$latte->addFilter($name, function ($s) use ($name) {
+				trigger_error("Filter |$name is deprecated.", E_USER_DEPRECATED);
+				return [Nette\Utils\Strings::class, $name]($s);
+			});
 		}
-		$latte->addFilter('null', function () {});
+		$latte->addFilter('null', function () {
+			trigger_error('Filter |null is deprecated.', E_USER_DEPRECATED);
+		});
 		$latte->addFilter('modifyDate', function ($time, $delta, $unit = null) {
 			return $time == null ? null : Nette\Utils\DateTime::from($time)->modify($delta . $unit); // intentionally ==
 		});
@@ -99,7 +106,7 @@ class TemplateFactory implements UI\ITemplateFactory
 
 		// default parameters
 		$template->user = $this->user;
-		$template->baseUri = $template->baseUrl = $this->httpRequest ? rtrim($this->httpRequest->getUrl()->getBaseUrl(), '/') : null;
+		$template->baseUrl = $this->httpRequest ? rtrim($this->httpRequest->getUrl()->getBaseUrl(), '/') : null;
 		$template->basePath = preg_replace('#https?://[^/]+#A', '', $template->baseUrl);
 		$template->flashes = [];
 		if ($control) {
@@ -116,11 +123,6 @@ class TemplateFactory implements UI\ITemplateFactory
 			$latte->addProvider('uiNonce', $nonce);
 		}
 		$latte->addProvider('cacheStorage', $this->cacheStorage);
-
-		// back compatibility
-		$template->_control = $control;
-		$template->_presenter = $presenter;
-		$template->netteCacheStorage = $this->cacheStorage;
 
 		if ($presenter instanceof UI\Presenter && $presenter->hasFlashSession()) {
 			$id = $control->getParameterId('flash');

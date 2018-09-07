@@ -1,4 +1,4 @@
-#JJ Web PHP web running Nette framework
+# JJ Web PHP web running Nette framework
 About Nette https://nette.org/en/download
 
 ## Create Nette project and run

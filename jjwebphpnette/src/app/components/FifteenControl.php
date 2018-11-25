@@ -1,5 +1,6 @@
 <?php
 
+
 declare(strict_types=1);
 
 use Nette\Application\UI;
@@ -24,10 +25,15 @@ class FifteenControl extends UI\Control
 	/** @persistent int */
 	public $round = 0;
 
+	/** Application Insights context */
+	protected $telemetryClient;
 
 	public function __construct()
 	{
 		$this->order = range(0, $this->width * $this->width - 1);
+		
+		$aiFactory = new AIFactory();
+		$this->telemetryClient = $aiFactory->getTelemetryClient();
 	}
 
 
@@ -38,6 +44,7 @@ class FifteenControl extends UI\Control
 		}
 
 		$this->move($x, $y);
+
 		$this->round++;
 		$this->onAfterClick($this);
 
@@ -101,6 +108,9 @@ class FifteenControl extends UI\Control
 		$emptyPos = $this->searchEmpty();
 		$this->order[$emptyPos] = $this->order[$pos];
 		$this->order[$pos] = 0;
+
+		// Application Insights telemetry - log move
+		$this->telemetryClient->trackEvent("Moved to $x, $y");
 	}
 
 

@@ -19,7 +19,8 @@
 		"nette/bootstrap": "^3.0",
 		"nette/robot-loader": "^3.0",
 		"latte/latte": "^3.0",
-		"tracy/tracy": "^2.4"
+		"tracy/tracy": "^2.4",
+		"microsoft/application-insights": "*"
 	},
 	"minimum-stability": "dev"
 }

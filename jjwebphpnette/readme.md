@@ -35,3 +35,11 @@ docker run -p 80:80 jjwebphpnette
 ```
 
 Open browser with url http://localhost
+
+## Build with Azure Build and publish to Azure Container Registry
+
+Create new Azure Container Registry, using my jjapicr
+
+```bash
+az acr build --registry jjapicr --image jjwebphpnette .
+```

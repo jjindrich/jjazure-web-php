@@ -11,7 +11,7 @@ class AIFactory
     {
         $this->telemetryClient = new \ApplicationInsights\Telemetry_Client();
 		$this->aicontext = $this->telemetryClient->getContext();
-		$this->aicontext->setInstrumentationKey('4d4abe90-adbf-45c0-82f7-ada5304b1625');
+		$this->aicontext->setInstrumentationKey('93dbbce2-517a-4141-83ad-0b0a0b0db7d9');
 		$this->aicontext->getSessionContext()->setId(session_id());
     }
 

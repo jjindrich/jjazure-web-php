@@ -222,9 +222,7 @@ class Url implements \JsonSerializable
 	 */
 	public function getPort(): ?int
 	{
-		return $this->port
-			? $this->port
-			: (self::$defaultPorts[$this->scheme] ?? null);
+		return $this->port ?: (self::$defaultPorts[$this->scheme] ?? null);
 	}
 
 
@@ -432,7 +430,7 @@ class Url implements \JsonSerializable
 	{
 		$this->path = preg_replace_callback(
 			'#[^!$&\'()*+,/:;=@%]+#',
-			function ($m) { return rawurlencode($m[0]); },
+			function (array $m): string { return rawurlencode($m[0]); },
 			self::unescape($this->path, '%/')
 		);
 		$this->host = strtolower($this->host);
@@ -463,7 +461,7 @@ class Url implements \JsonSerializable
 		if ($reserved !== '') {
 			$s = preg_replace_callback(
 				'#%(' . substr(chunk_split(bin2hex($reserved), 2, '|'), 0, -1) . ')#i',
-				function ($m) { return '%25' . strtoupper($m[1]); },
+				function (array $m): string { return '%25' . strtoupper($m[1]); },
 				$s
 			);
 		}

@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Nette\DI;
 
 use Nette;
-use Nette\Utils\Validators;
 
 
 /**
@@ -26,11 +25,11 @@ class Compiler
 	/** @var ContainerBuilder */
 	private $builder;
 
-	/** @var array */
-	private $config = [];
+	/** @var Config\Processor */
+	private $configProcessor;
 
 	/** @var array */
-	private $serviceConfigs = [];
+	private $config = [];
 
 	/** @var DependencyChecker */
 	private $dependencies;
@@ -49,6 +48,7 @@ class Compiler
 	{
 		$this->builder = $builder ?: new ContainerBuilder;
 		$this->dependencies = new DependencyChecker;
+		$this->configProcessor = new Config\Processor($this->builder);
 	}
 
 
@@ -63,6 +63,12 @@ class Compiler
 		} elseif (isset($this->extensions[$name]) || isset(self::$reserved[$name])) {
 			throw new Nette\InvalidArgumentException("Name '$name' is already used or reserved.");
 		}
+		$lname = strtolower($name);
+		foreach (array_keys($this->extensions + self::$reserved) as $nm) {
+			if ($lname === strtolower((string) $nm)) {
+				throw new Nette\InvalidArgumentException("Name of extension '$name' has the same name as '$nm' in a case-insensitive manner.");
+			}
+		}
 		$this->extensions[$name] = $extension->setCompiler($this, $name);
 		return $this;
 	}
@@ -71,7 +77,7 @@ class Compiler
 	public function getExtensions(string $type = null): array
 	{
 		return $type
-			? array_filter($this->extensions, function ($item) use ($type) { return $item instanceof $type; })
+			? array_filter($this->extensions, function ($item) use ($type): bool { return $item instanceof $type; })
 			: $this->extensions;
 	}
 
@@ -98,10 +104,7 @@ class Compiler
 	 */
 	public function addConfig(array $config)
 	{
-		if (isset($config['services'])) {
-			$this->serviceConfigs[] = $config['services'];
-		}
-		$this->config = Config\Helpers::merge($config, $this->config);
+		$this->config = $this->configProcessor->merge($this->config, $config);
 		return $this;
 	}
 
@@ -165,16 +168,14 @@ class Compiler
 		$this->processParameters();
 		$this->processExtensions();
 		$this->processServices();
-		$classes = $this->generateCode();
-		array_unshift($classes, 'declare(strict_types=1);');
-		return implode("\n\n\n", $classes);
+		return $this->generateCode();
 	}
 
 
 	/** @internal */
 	public function processParameters(): void
 	{
-		$params = isset($this->config['parameters']) ? $this->config['parameters'] : [];
+		$params = $this->config['parameters'] ?? [];
 		foreach ($this->dynamicParams as $key) {
 			$params[$key] = array_key_exists($key, $params)
 				? ContainerBuilder::literal('$this->parameters[?] \?\? ?', [$key, $params[$key]])
@@ -187,11 +188,11 @@ class Compiler
 	/** @internal */
 	public function processExtensions(): void
 	{
-		$this->config = Helpers::expand(array_diff_key($this->config, self::$reserved), $this->builder->parameters)
-			+ array_intersect_key($this->config, self::$reserved);
+		$config = array_diff_key($this->config, self::$reserved);
+		$config = Helpers::expand($config, $this->builder->parameters);
 
 		foreach ($first = $this->getExtensions(Extensions\ExtensionsExtension::class) as $name => $extension) {
-			$extension->setConfig($this->config[$name] ?? []);
+			$extension->setConfig($config[$name] ?? []);
 			$extension->loadConfiguration();
 		}
 
@@ -199,8 +200,8 @@ class Compiler
 		$this->extensions = array_merge(array_diff_key($this->extensions, $last), $last);
 
 		$extensions = array_diff_key($this->extensions, $first);
-		foreach (array_intersect_key($extensions, $this->config) as $name => $extension) {
-			$extension->setConfig($this->config[$name] ?: []);
+		foreach (array_intersect_key($extensions, $config) as $name => $extension) {
+			$extension->setConfig($config[$name] ?: []);
 		}
 
 		foreach ($extensions as $extension) {
@@ -211,7 +212,7 @@ class Compiler
 			$extra = implode("', '", array_keys($extra));
 			throw new Nette\DeprecatedException("Extensions '$extra' were added while container was being compiled.");
 
-		} elseif ($extra = key(array_diff_key($this->config, self::$reserved, $this->extensions))) {
+		} elseif ($extra = key(array_diff_key($config, $this->extensions))) {
 			$hint = Nette\Utils\ObjectHelpers::getSuggestion(array_keys(self::$reserved + $this->extensions), $extra);
 			throw new Nette\InvalidStateException(
 				"Found section '$extra' in configuration, but corresponding extension is missing"
@@ -224,16 +225,14 @@ class Compiler
 	/** @internal */
 	public function processServices(): void
 	{
-		foreach ($this->serviceConfigs as $config) {
-			self::loadDefinitions($this->builder, $config);
-		}
+		$this->loadDefinitions($this->config['services'] ?? []);
 	}
 
 
 	/** @internal */
-	public function generateCode(): array
+	public function generateCode(): string
 	{
-		$this->builder->prepareClassList();
+		$this->builder->resolve();
 
 		foreach ($this->extensions as $extension) {
 			$extension->beforeCompile();
@@ -241,14 +240,15 @@ class Compiler
 		}
 
 		$generator = new PhpGenerator($this->builder);
-		$classes = $generator->generate($this->className);
-		$classes[0]->addMethod('initialize');
+		$class = $generator->generate($this->className);
+		$class->addMethod('initialize');
 		$this->dependencies->add($this->builder->getDependencies());
 
 		foreach ($this->extensions as $extension) {
-			$extension->afterCompile($classes[0]);
+			$extension->afterCompile($class);
 		}
-		return $classes;
+
+		return "declare(strict_types=1);\n\n\n" . $class->__toString();
 	}
 
 
@@ -258,172 +258,23 @@ class Compiler
 	/**
 	 * Adds service definitions from configuration.
 	 */
-	public static function loadDefinitions(ContainerBuilder $builder, array $services, string $namespace = null): void
+	public function loadDefinitions(array $services, string $namespace = null): void
 	{
-		foreach ($services as $name => $def) {
-			if (is_int($name)) {
-				$postfix = $def instanceof Statement && is_string($def->getEntity()) ? '.' . $def->getEntity() : (is_scalar($def) ? ".$def" : '');
-				$name = (count($builder->getDefinitions()) + 1) . preg_replace('#\W+#', '_', $postfix);
-			} elseif (preg_match('#^@[\w\\\\]+\z#', $name)) {
-				$name = $builder->getByType(substr($name, 1), true);
-			} elseif ($namespace) {
-				$name = $namespace . '.' . $name;
-			}
-
-			if ($def === false) {
-				$builder->removeDefinition($name);
-				continue;
-			}
-			if ($namespace) {
-				$def = Helpers::prefixServiceName($def, $namespace);
-			}
-
-			$params = $builder->parameters;
-			if (is_array($def) && isset($def['parameters'])) {
-				foreach ((array) $def['parameters'] as $k => $v) {
-					$v = explode(' ', is_int($k) ? $v : $k);
-					$params[end($v)] = $builder::literal('$' . end($v));
-				}
-			}
-			$def = Helpers::expand($def, $params);
-
-			if (is_array($def) && !empty($def['alteration']) && !$builder->hasDefinition($name)) {
-				throw new ServiceCreationException("Service '$name': missing original definition for alteration.");
-			}
-			if (Config\Helpers::takeParent($def)) {
-				$builder->removeDefinition($name);
-			}
-			$definition = $builder->hasDefinition($name)
-				? $builder->getDefinition($name)
-				: $builder->addDefinition($name);
-
-			try {
-				static::loadDefinition($definition, $def, $name);
-			} catch (\Exception $e) {
-				throw new ServiceCreationException("Service '$name': " . $e->getMessage(), 0, $e);
-			}
+		foreach ($services as &$def) {
+			$def = $this->configProcessor->normalizeStructure($def);
 		}
+		if ($namespace) {
+			$services = $this->configProcessor->applyNamespace($services, $namespace);
+		}
+		$this->configProcessor->loadDefinitions($services, $namespace);
 	}
 
 
 	/**
-	 * Parses single service definition from configuration.
+	 * @deprecated
 	 */
-	public static function loadDefinition(ServiceDefinition $definition, $config, string $name = null): void
+	public static function loadDefinition(): void
 	{
-		if ($config === null) {
-			return;
-
-		} elseif (is_string($config) && interface_exists($config)) {
-			$config = ['implement' => $config];
-
-		} elseif ($config instanceof Statement && is_string($config->getEntity()) && interface_exists($config->getEntity())) {
-			$config = ['implement' => $config->getEntity(), 'factory' => array_shift($config->arguments)];
-
-		} elseif (!is_array($config) || isset($config[0], $config[1])) {
-			$config = ['factory' => $config];
-		}
-
-		$known = ['type', 'class', 'factory', 'arguments', 'setup', 'autowired', 'dynamic', 'inject', 'parameters', 'implement', 'run', 'tags', 'alteration'];
-		if ($error = array_diff(array_keys($config), $known)) {
-			$hints = array_filter(array_map(function ($error) use ($known) {
-				return Nette\Utils\ObjectHelpers::getSuggestion($known, $error);
-			}, $error));
-			$hint = $hints ? ", did you mean '" . implode("', '", $hints) . "'?" : '.';
-			throw new Nette\InvalidStateException(sprintf("Unknown key '%s' in definition of service$hint", implode("', '", $error)));
-		}
-
-		$config = Helpers::filterArguments($config);
-
-		if (array_key_exists('class', $config) || array_key_exists('factory', $config)) {
-			$definition->setType(null);
-			$definition->setFactory(null);
-		}
-
-		if (array_key_exists('type', $config)) {
-			Validators::assertField($config, 'type', 'string|null');
-			$definition->setType($config['type']);
-			if (array_key_exists('class', $config)) {
-				throw new Nette\InvalidStateException("Unexpected 'class' when 'type' is used.");
-			}
-		}
-
-		if (array_key_exists('class', $config)) {
-			Validators::assertField($config, 'class', 'string|Nette\DI\Statement|null');
-			if ($config['class'] instanceof Statement) {
-				trigger_error("Service '$name': option 'class' should be changed to 'factory'.", E_USER_DEPRECATED);
-			} else {
-				$definition->setType($config['class']);
-			}
-			$definition->setFactory($config['class']);
-		}
-
-		if (array_key_exists('factory', $config)) {
-			Validators::assertField($config, 'factory', 'callable|Nette\DI\Statement|null');
-			$definition->setFactory($config['factory']);
-		}
-
-		if (array_key_exists('arguments', $config)) {
-			Validators::assertField($config, 'arguments', 'array');
-			$arguments = $config['arguments'];
-			if (!Config\Helpers::takeParent($arguments) && !Nette\Utils\Arrays::isList($arguments) && $definition->getFactory()) {
-				$arguments += $definition->getFactory()->arguments;
-			}
-			$definition->setArguments($arguments);
-		}
-
-		if (isset($config['setup'])) {
-			if (Config\Helpers::takeParent($config['setup'])) {
-				$definition->setSetup([]);
-			}
-			Validators::assertField($config, 'setup', 'list');
-			foreach ($config['setup'] as $id => $setup) {
-				Validators::assert($setup, 'callable|Nette\DI\Statement|array:1', "setup item #$id");
-				if (is_array($setup)) {
-					$setup = new Statement(key($setup), array_values($setup));
-				}
-				$definition->addSetup($setup);
-			}
-		}
-
-		if (isset($config['parameters'])) {
-			Validators::assertField($config, 'parameters', 'array');
-			$definition->setParameters($config['parameters']);
-		}
-
-		if (isset($config['implement'])) {
-			Validators::assertField($config, 'implement', 'string');
-			$definition->setImplement($config['implement']);
-			$definition->setAutowired(true);
-		}
-
-		if (isset($config['autowired'])) {
-			Validators::assertField($config, 'autowired', 'bool|string|array');
-			$definition->setAutowired($config['autowired']);
-		}
-
-		if (isset($config['dynamic'])) {
-			Validators::assertField($config, 'dynamic', 'bool');
-			$definition->setDynamic($config['dynamic']);
-		}
-
-		if (isset($config['inject'])) {
-			Validators::assertField($config, 'inject', 'bool');
-			$definition->addTag(Extensions\InjectExtension::TAG_INJECT, $config['inject']);
-		}
-
-		if (isset($config['tags'])) {
-			Validators::assertField($config, 'tags', 'array');
-			if (Config\Helpers::takeParent($config['tags'])) {
-				$definition->setTags([]);
-			}
-			foreach ($config['tags'] as $tag => $attrs) {
-				if (is_int($tag) && is_string($attrs)) {
-					$definition->addTag($attrs);
-				} else {
-					$definition->addTag($tag, $attrs);
-				}
-			}
-		}
+		throw new Nette\DeprecatedException(__METHOD__ . '() is deprecated.');
 	}
 }

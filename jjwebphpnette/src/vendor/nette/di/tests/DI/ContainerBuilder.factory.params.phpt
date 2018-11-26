@@ -15,21 +15,23 @@ require __DIR__ . '/../bootstrap.php';
 
 interface StdClassFactory
 {
-	function create(stdClass $a, array $b, $c = null);
+	function create(stdClass $a, array $b, $c = null): stdClass;
 }
 
 
 $builder = new DI\ContainerBuilder;
-$builder->addDefinition('one')
+$builder->addFactoryDefinition('one')
 	->setImplement('StdClassFactory')
-	->setFactory('stdClass')
-	->addSetup('$a', [$builder::literal('$a')]);
+	->getResultDefinition()
+		->setFactory('stdClass')
+		->addSetup('$a', [$builder::literal('$a')]);
 
-$builder->addDefinition('two')
+$builder->addFactoryDefinition('two')
 	->setParameters(['stdClass foo', 'array bar', 'foobar' => null])
 	->setImplement('StdClassFactory')
-	->setFactory('stdClass')
-	->addSetup('$a', [$builder::literal('$foo')]);
+	->getResultDefinition()
+		->setFactory('stdClass')
+		->addSetup('$a', [$builder::literal('$foo')]);
 
 $builder->addDefinition('three')
 	->setType('stdClass');

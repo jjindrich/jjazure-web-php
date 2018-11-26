@@ -28,6 +28,8 @@ final class FileUpload
 {
 	use Nette\SmartObject;
 
+	public const IMAGE_MIME_TYPES = ['image/gif', 'image/png', 'image/jpeg', 'image/webp'];
+
 	/** @var string */
 	private $name;
 
@@ -152,7 +154,7 @@ final class FileUpload
 		Nette\Utils\Callback::invokeSafe(
 			is_uploaded_file($this->tmpName) ? 'move_uploaded_file' : 'rename',
 			[$this->tmpName, $dest],
-			function ($message) use ($dest) {
+			function (string $message) use ($dest): void {
 				throw new Nette\InvalidStateException("Unable to move uploaded file '$this->tmpName' to '$dest'. $message");
 			}
 		);
@@ -167,7 +169,7 @@ final class FileUpload
 	 */
 	public function isImage(): bool
 	{
-		return in_array($this->getContentType(), ['image/gif', 'image/png', 'image/jpeg', 'image/webp'], true);
+		return in_array($this->getContentType(), self::IMAGE_MIME_TYPES, true);
 	}
 
 

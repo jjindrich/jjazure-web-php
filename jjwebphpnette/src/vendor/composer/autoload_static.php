@@ -4,11 +4,56 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit839a085ed02ec423e44c22a7c88ef878
+class ComposerStaticInit06ba0a7314414f5625b26c5500b2fdc9
 {
     public static $files = array (
+        '59af96974553a1fc6407327354b6f47e' => __DIR__ . '/..' . '/nette/di/src/compatibility.php',
         '7745382c92b7799bf1294b1f43023ba2' => __DIR__ . '/..' . '/tracy/tracy/src/shortcuts.php',
+        '7b11c4dc42b3b3023073cb14e519683c' => __DIR__ . '/..' . '/ralouphie/getallheaders/src/getallheaders.php',
+        'c964ee0ededf28c96ebd9db5099ef910' => __DIR__ . '/..' . '/guzzlehttp/promises/src/functions_include.php',
+        'a0edc8309cc5e1d60e3047b5df6b7052' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/functions_include.php',
+        '37a3dc5111fe8f707ab4c132ef1dbc62' => __DIR__ . '/..' . '/guzzlehttp/guzzle/src/functions_include.php',
         'e7a6fd2e7a869bb207158e9416bdd9b0' => __DIR__ . '/..' . '/nette/application/src/compatibility.php',
+    );
+
+    public static $prefixLengthsPsr4 = array (
+        'P' => 
+        array (
+            'Psr\\Http\\Message\\' => 17,
+        ),
+        'G' => 
+        array (
+            'GuzzleHttp\\Psr7\\' => 16,
+            'GuzzleHttp\\Promise\\' => 19,
+            'GuzzleHttp\\' => 11,
+        ),
+        'A' => 
+        array (
+            'ApplicationInsights\\' => 20,
+        ),
+    );
+
+    public static $prefixDirsPsr4 = array (
+        'Psr\\Http\\Message\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/psr/http-message/src',
+        ),
+        'GuzzleHttp\\Psr7\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/guzzlehttp/psr7/src',
+        ),
+        'GuzzleHttp\\Promise\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/guzzlehttp/promises/src',
+        ),
+        'GuzzleHttp\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/guzzlehttp/guzzle/src',
+        ),
+        'ApplicationInsights\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/microsoft/application-insights/ApplicationInsights',
+        ),
     );
 
     public static $classMap = array (
@@ -110,17 +155,26 @@ class ComposerStaticInit839a085ed02ec423e44c22a7c88ef878
         'Nette\\ComponentModel\\IContainer' => __DIR__ . '/..' . '/nette/component-model/src/ComponentModel/IContainer.php',
         'Nette\\ComponentModel\\RecursiveComponentIterator' => __DIR__ . '/..' . '/nette/component-model/src/ComponentModel/RecursiveComponentIterator.php',
         'Nette\\Configurator' => __DIR__ . '/..' . '/nette/bootstrap/src/Bootstrap/Configurator.php',
+        'Nette\\DI\\Autowiring' => __DIR__ . '/..' . '/nette/di/src/DI/Autowiring.php',
         'Nette\\DI\\Compiler' => __DIR__ . '/..' . '/nette/di/src/DI/Compiler.php',
         'Nette\\DI\\CompilerExtension' => __DIR__ . '/..' . '/nette/di/src/DI/CompilerExtension.php',
-        'Nette\\DI\\Config\\Adapters\\IniAdapter' => __DIR__ . '/..' . '/nette/di/src/DI/Config/Adapters/IniAdapter.php',
+        'Nette\\DI\\Config\\Adapter' => __DIR__ . '/..' . '/nette/di/src/DI/Config/Adapter.php',
         'Nette\\DI\\Config\\Adapters\\NeonAdapter' => __DIR__ . '/..' . '/nette/di/src/DI/Config/Adapters/NeonAdapter.php',
         'Nette\\DI\\Config\\Adapters\\PhpAdapter' => __DIR__ . '/..' . '/nette/di/src/DI/Config/Adapters/PhpAdapter.php',
         'Nette\\DI\\Config\\Helpers' => __DIR__ . '/..' . '/nette/di/src/DI/Config/Helpers.php',
-        'Nette\\DI\\Config\\IAdapter' => __DIR__ . '/..' . '/nette/di/src/DI/Config/IAdapter.php',
         'Nette\\DI\\Config\\Loader' => __DIR__ . '/..' . '/nette/di/src/DI/Config/Loader.php',
+        'Nette\\DI\\Config\\Processor' => __DIR__ . '/..' . '/nette/di/src/DI/Config/Processor.php',
         'Nette\\DI\\Container' => __DIR__ . '/..' . '/nette/di/src/DI/Container.php',
         'Nette\\DI\\ContainerBuilder' => __DIR__ . '/..' . '/nette/di/src/DI/ContainerBuilder.php',
         'Nette\\DI\\ContainerLoader' => __DIR__ . '/..' . '/nette/di/src/DI/ContainerLoader.php',
+        'Nette\\DI\\Definitions\\AccessorDefinition' => __DIR__ . '/..' . '/nette/di/src/DI/Definitions/AccessorDefinition.php',
+        'Nette\\DI\\Definitions\\Definition' => __DIR__ . '/..' . '/nette/di/src/DI/Definitions/Definition.php',
+        'Nette\\DI\\Definitions\\FactoryDefinition' => __DIR__ . '/..' . '/nette/di/src/DI/Definitions/FactoryDefinition.php',
+        'Nette\\DI\\Definitions\\ImportedDefinition' => __DIR__ . '/..' . '/nette/di/src/DI/Definitions/ImportedDefinition.php',
+        'Nette\\DI\\Definitions\\LocatorDefinition' => __DIR__ . '/..' . '/nette/di/src/DI/Definitions/LocatorDefinition.php',
+        'Nette\\DI\\Definitions\\Reference' => __DIR__ . '/..' . '/nette/di/src/DI/Definitions/Reference.php',
+        'Nette\\DI\\Definitions\\ServiceDefinition' => __DIR__ . '/..' . '/nette/di/src/DI/Definitions/ServiceDefinition.php',
+        'Nette\\DI\\Definitions\\Statement' => __DIR__ . '/..' . '/nette/di/src/DI/Definitions/Statement.php',
         'Nette\\DI\\DependencyChecker' => __DIR__ . '/..' . '/nette/di/src/DI/DependencyChecker.php',
         'Nette\\DI\\Extensions\\ConstantsExtension' => __DIR__ . '/..' . '/nette/di/src/DI/Extensions/ConstantsExtension.php',
         'Nette\\DI\\Extensions\\DIExtension' => __DIR__ . '/..' . '/nette/di/src/DI/Extensions/DIExtension.php',
@@ -130,10 +184,10 @@ class ComposerStaticInit839a085ed02ec423e44c22a7c88ef878
         'Nette\\DI\\Extensions\\PhpExtension' => __DIR__ . '/..' . '/nette/di/src/DI/Extensions/PhpExtension.php',
         'Nette\\DI\\Helpers' => __DIR__ . '/..' . '/nette/di/src/DI/Helpers.php',
         'Nette\\DI\\MissingServiceException' => __DIR__ . '/..' . '/nette/di/src/DI/exceptions.php',
+        'Nette\\DI\\NotAllowedDuringResolvingException' => __DIR__ . '/..' . '/nette/di/src/DI/exceptions.php',
         'Nette\\DI\\PhpGenerator' => __DIR__ . '/..' . '/nette/di/src/DI/PhpGenerator.php',
+        'Nette\\DI\\Resolver' => __DIR__ . '/..' . '/nette/di/src/DI/Resolver.php',
         'Nette\\DI\\ServiceCreationException' => __DIR__ . '/..' . '/nette/di/src/DI/exceptions.php',
-        'Nette\\DI\\ServiceDefinition' => __DIR__ . '/..' . '/nette/di/src/DI/ServiceDefinition.php',
-        'Nette\\DI\\Statement' => __DIR__ . '/..' . '/nette/di/src/DI/Statement.php',
         'Nette\\DeprecatedException' => __DIR__ . '/..' . '/nette/utils/src/Utils/exceptions.php',
         'Nette\\DirectoryNotFoundException' => __DIR__ . '/..' . '/nette/utils/src/Utils/exceptions.php',
         'Nette\\FileNotFoundException' => __DIR__ . '/..' . '/nette/utils/src/Utils/exceptions.php',
@@ -186,7 +240,6 @@ class ComposerStaticInit839a085ed02ec423e44c22a7c88ef878
         'Nette\\PhpGenerator\\Traits\\VisibilityAware' => __DIR__ . '/..' . '/nette/php-generator/src/PhpGenerator/Traits/VisibilityAware.php',
         'Nette\\SmartObject' => __DIR__ . '/..' . '/nette/utils/src/Utils/SmartObject.php',
         'Nette\\StaticClass' => __DIR__ . '/..' . '/nette/utils/src/Utils/StaticClass.php',
-        'Nette\\StaticClassException' => __DIR__ . '/..' . '/nette/utils/src/Utils/exceptions.php',
         'Nette\\UnexpectedValueException' => __DIR__ . '/..' . '/nette/utils/src/Utils/exceptions.php',
         'Nette\\Utils\\ArrayHash' => __DIR__ . '/..' . '/nette/utils/src/Utils/ArrayHash.php',
         'Nette\\Utils\\ArrayList' => __DIR__ . '/..' . '/nette/utils/src/Utils/ArrayList.php',
@@ -230,7 +283,9 @@ class ComposerStaticInit839a085ed02ec423e44c22a7c88ef878
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->classMap = ComposerStaticInit839a085ed02ec423e44c22a7c88ef878::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit06ba0a7314414f5625b26c5500b2fdc9::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit06ba0a7314414f5625b26c5500b2fdc9::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit06ba0a7314414f5625b26c5500b2fdc9::$classMap;
 
         }, null, ClassLoader::class);
     }

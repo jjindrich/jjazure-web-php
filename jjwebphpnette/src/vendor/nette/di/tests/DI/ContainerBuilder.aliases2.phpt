@@ -29,16 +29,18 @@ interface ServiceFactory2
 
 $builder = new DI\ContainerBuilder;
 
-$builder->addDefinition('serviceFactory')
+$builder->addFactoryDefinition('serviceFactory')
 	->setImplement('ServiceFactory')
-	->setFactory('@service');
+	->getResultDefinition()
+		->setFactory('@service');
 
-$builder->addDefinition('serviceFactoryViaClass')
+$builder->addFactoryDefinition('serviceFactoryViaClass')
 	->setImplement('ServiceFactory2')
-	->setFactory('@\Service');
+	->getResultDefinition()
+		->setFactory('@\Service');
 
 $builder->addDefinition('service')
-	->setType('Foo');
+	->setType('stdClass');
 
 
 $builder->addAlias('aliased.service', 'service');

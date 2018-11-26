@@ -7,7 +7,8 @@
 declare(strict_types=1);
 
 use Nette\DI;
-use Nette\DI\Statement;
+use Nette\DI\Definitions\Reference;
+use Nette\DI\Definitions\Statement;
 use Tester\Assert;
 
 
@@ -111,31 +112,31 @@ services:
 $builder = $compiler->getContainerBuilder();
 
 Assert::equal([
-	new Statement(['@last.one', 'injectA']),
-	new Statement(['@last.one', 'injectB']),
-	new Statement(['@last.one', 'injectC']),
-	new Statement(['@last.one', 'injectD']),
-	new Statement(['@last.one', '$e'], ['@a']),
-	new Statement(['@last.one', '$c'], ['@std']),
-	new Statement(['@last.one', '$a'], ['@std']),
+	new Statement([new Reference('self'), 'injectA']),
+	new Statement([new Reference('self'), 'injectB']),
+	new Statement([new Reference('self'), 'injectC']),
+	new Statement([new Reference('self'), 'injectD']),
+	new Statement([new Reference('self'), '$e'], [new Reference('a')]),
+	new Statement([new Reference('self'), '$c'], [new Reference('std')]),
+	new Statement([new Reference('self'), '$a'], [new Reference('std')]),
 ], $builder->getDefinition('last.one')->getSetup());
 
 Assert::equal([
-	new Statement(['@ext.one', 'injectA']),
-	new Statement(['@ext.one', 'injectB']),
-	new Statement(['@ext.one', 'injectC']),
-	new Statement(['@ext.one', 'injectD']),
-	new Statement(['@ext.one', '$e'], ['@a']),
-	new Statement(['@ext.one', '$c'], ['@std']),
-	new Statement(['@ext.one', '$a'], ['@std']),
+	new Statement([new Reference('self'), 'injectA']),
+	new Statement([new Reference('self'), 'injectB']),
+	new Statement([new Reference('self'), 'injectC']),
+	new Statement([new Reference('self'), 'injectD']),
+	new Statement([new Reference('self'), '$e'], [new Reference('a')]),
+	new Statement([new Reference('self'), '$c'], [new Reference('std')]),
+	new Statement([new Reference('self'), '$a'], [new Reference('std')]),
 ], $builder->getDefinition('ext.one')->getSetup());
 
 Assert::equal([
-	new Statement(['@two', 'injectA']),
-	new Statement(['@two', 'injectB'], [1]),
-	new Statement(['@two', 'injectC']),
-	new Statement(['@two', 'injectD']),
-	new Statement(['@two', '$e'], ['@b']),
-	new Statement(['@two', '$c'], ['@std']),
-	new Statement(['@two', '$a'], ['@std']),
+	new Statement([new Reference('self'), 'injectA']),
+	new Statement([new Reference('self'), 'injectB'], [1]),
+	new Statement([new Reference('self'), 'injectC']),
+	new Statement([new Reference('self'), 'injectD']),
+	new Statement([new Reference('self'), '$e'], [new Reference('b')]),
+	new Statement([new Reference('self'), '$c'], [new Reference('std')]),
+	new Statement([new Reference('self'), '$a'], [new Reference('std')]),
 ], $builder->getDefinition('two')->getSetup());

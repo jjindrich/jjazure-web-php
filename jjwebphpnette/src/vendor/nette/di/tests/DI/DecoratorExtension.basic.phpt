@@ -7,7 +7,8 @@
 declare(strict_types=1);
 
 use Nette\DI;
-use Nette\DI\Statement;
+use Nette\DI\Definitions\Reference;
+use Nette\DI\Definitions\Statement;
 use Tester\Assert;
 
 
@@ -73,9 +74,9 @@ Assert::same(
 Assert::true($builder->getDefinition('one')->getTag('inject'));
 
 Assert::equal([
-	new Statement(['@one', 'setup'], ['Service']),
-	new Statement(['@one', 'setup'], ['Object']),
-	new Statement(['@one', 'setup'], ['Iface']),
-	new Statement(['@one', 'setup']),
-	new Statement(['@one', '$a'], [10]),
+	new Statement([new Reference('self'), 'setup'], ['Service']),
+	new Statement([new Reference('self'), 'setup'], ['Object']),
+	new Statement([new Reference('self'), 'setup'], ['Iface']),
+	new Statement([new Reference('self'), 'setup']),
+	new Statement([new Reference('self'), '$a'], [10]),
 ], $builder->getDefinition('one')->getSetup());

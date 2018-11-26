@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace Nette\DI\Extensions;
 
 use Nette;
-
+use Nette\DI\Definitions;
 
 /**
  * Decorators for services.
@@ -31,7 +31,7 @@ final class DecoratorExtension extends Nette\DI\CompilerExtension
 			if ($info['inject'] !== null) {
 				$info['tags'][InjectExtension::TAG_INJECT] = $info['inject'];
 			}
-			$info = Nette\DI\Helpers::filterArguments($info);
+			$info = Nette\DI\Config\Processor::filterArguments($info);
 			$this->addSetups($type, (array) $info['setup']);
 			$this->addTags($type, (array) $info['tags']);
 		}
@@ -43,7 +43,7 @@ final class DecoratorExtension extends Nette\DI\CompilerExtension
 		foreach ($this->findByType($type) as $def) {
 			foreach ($setups as $setup) {
 				if (is_array($setup)) {
-					$setup = new Nette\DI\Statement(key($setup), array_values($setup));
+					$setup = new Definitions\Statement(key($setup), array_values($setup));
 				}
 				$def->addSetup($setup);
 			}
@@ -62,9 +62,9 @@ final class DecoratorExtension extends Nette\DI\CompilerExtension
 
 	private function findByType(string $type): array
 	{
-		return array_filter($this->getContainerBuilder()->getDefinitions(), function ($def) use ($type) {
-			return is_a($def->getImplement(), $type, true)
-				|| ($def->getImplementMode() !== $def::IMPLEMENT_MODE_GET && is_a($def->getType(), $type, true));
+		return array_filter($this->getContainerBuilder()->getDefinitions(), function (Definitions\Definition $def) use ($type): bool {
+			return is_a($def->getType(), $type, true)
+				|| ($def instanceof Definitions\FactoryDefinition && is_a($def->getResultType(), $type, true));
 		});
 	}
 }

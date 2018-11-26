@@ -56,7 +56,7 @@ class DeprecatedException extends NotSupportedException
 /**
  * The exception that is thrown when accessing a class member (property or method) fails.
  */
-class MemberAccessException extends \LogicException
+class MemberAccessException extends \Error
 {
 }
 
@@ -105,14 +105,6 @@ class OutOfRangeException extends \OutOfRangeException
  * The exception that is thrown when a value (typically returned by function) does not match with the expected value.
  */
 class UnexpectedValueException extends \UnexpectedValueException
-{
-}
-
-
-/**
- * The exception that is thrown when static class is instantiated.
- */
-class StaticClassException extends \LogicException
 {
 }
 

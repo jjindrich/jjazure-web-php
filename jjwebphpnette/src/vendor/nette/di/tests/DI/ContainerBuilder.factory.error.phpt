@@ -1,13 +1,14 @@
 <?php
 
 /**
- * Test: Nette\DI\ContainerBuilder and generated factories errors.
+ * Test: Nette\DI\ContainerBuilder and errors in factory.
  */
 
 declare(strict_types=1);
 
 use Nette\DI;
-use Nette\DI\Statement;
+use Nette\DI\Definitions\Reference;
+use Nette\DI\Definitions\Statement;
 use Tester\Assert;
 
 
@@ -17,8 +18,7 @@ require __DIR__ . '/../bootstrap.php';
 Assert::exception(function () {
 	$builder = new DI\ContainerBuilder;
 	$builder->addDefinition('one')->setType('X')->setFactory('Unknown');
-	$builder->complete();
-}, Nette\InvalidStateException::class, "Class Unknown used in service 'one' not found.");
+}, Nette\InvalidArgumentException::class, "Service 'one': Class or interface 'X' not found.");
 
 
 Assert::exception(function () {
@@ -26,66 +26,37 @@ Assert::exception(function () {
 	$builder->addDefinition('one')->setFactory('@two');
 	$builder->addDefinition('two')->setFactory('Unknown');
 	$builder->complete();
-}, Nette\InvalidStateException::class, "Class Unknown used in service 'two' not found.");
+}, Nette\InvalidStateException::class, "Service 'two': Class Unknown not found.");
+
+
+Assert::exception(function () {
+	$builder = new DI\ContainerBuilder;
+	$builder->addDefinition('one')->setFactory(new Reference('two'));
+	$builder->addDefinition('two')->setFactory('Unknown');
+	$builder->complete();
+}, Nette\InvalidStateException::class, "Service 'two': Class Unknown not found.");
 
 
 Assert::exception(function () {
 	$builder = new DI\ContainerBuilder;
 	$builder->addDefinition('one')->setFactory('stdClass::foo');
 	$builder->complete();
-}, Nette\InvalidStateException::class, "Method stdClass::foo() used in service 'one' is not callable.");
+}, Nette\InvalidStateException::class, "Service 'one': Method stdClass::foo() is not callable.");
 
 
 Assert::exception(function () {
 	$builder = new DI\ContainerBuilder;
 	$builder->addDefinition('one')->setFactory('Nette\DI\Container::foo'); // has __magic
 	$builder->complete();
-}, Nette\InvalidStateException::class, "Method Nette\\DI\\Container::foo() used in service 'one' is not callable.");
+}, Nette\InvalidStateException::class, "Service 'one': Method Nette\\DI\\Container::foo() is not callable.");
 
 
 Assert::exception(function () {
 	$builder = new DI\ContainerBuilder;
-	$builder->addDefinition('one')->setImplement('Unknown')->setType('stdClass');
-	$builder->complete();
-}, Nette\InvalidStateException::class, "Interface Unknown used in service 'one' not found.");
+	$builder->addFactoryDefinition('one')
+		->setImplement('Unknown');
+}, Nette\InvalidArgumentException::class, "Service 'one': Interface 'Unknown' not found.");
 
-
-interface Bad1
-{
-	public static function create();
-}
-
-Assert::exception(function () {
-	$builder = new DI\ContainerBuilder;
-	$builder->addDefinition('one')->setImplement('Bad1')->setFactory('stdClass');
-	$builder->complete();
-}, Nette\InvalidStateException::class, "Interface Bad1 used in service 'one' must have just one non-static method create() or get().");
-
-
-interface Bad2
-{
-	public function createx();
-}
-
-Assert::exception(function () {
-	$builder = new DI\ContainerBuilder;
-	$builder->addDefinition('one')->setImplement('Bad2')->setFactory('stdClass');
-	$builder->complete();
-}, Nette\InvalidStateException::class, "Interface Bad2 used in service 'one' must have just one non-static method create() or get().");
-
-
-interface Bad3
-{
-	public function other();
-
-	public function create();
-}
-
-Assert::exception(function () {
-	$builder = new DI\ContainerBuilder;
-	$builder->addDefinition('one')->setImplement('Bad3')->setFactory('stdClass');
-	$builder->complete();
-}, Nette\InvalidStateException::class, "Interface Bad3 used in service 'one' must have just one non-static method create() or get().");
 
 
 interface Bad4
@@ -95,9 +66,10 @@ interface Bad4
 
 Assert::exception(function () {
 	$builder = new DI\ContainerBuilder;
-	$builder->addDefinition('one')->setImplement('Bad4');
+	$builder->addFactoryDefinition('one')
+		->setImplement('Bad4');
 	$builder->complete();
-}, Nette\InvalidStateException::class, "Method Bad4::create() used in service 'one' has not return type hint or annotation @return.");
+}, Nette\InvalidStateException::class, "Service 'one' (type of Bad4): Method Bad4::create() has not return type hint or annotation @return.");
 
 
 interface Bad5
@@ -107,9 +79,10 @@ interface Bad5
 
 Assert::exception(function () {
 	$builder = new DI\ContainerBuilder;
-	$builder->addDefinition('one')->setImplement('Bad5')->setFactory('stdClass');
+	$builder->addAccessorDefinition('one')
+		->setImplement('Bad5');
 	$builder->complete();
-}, Nette\InvalidStateException::class, "Method Bad5::get() used in service 'one' must have no arguments.");
+}, Nette\InvalidArgumentException::class, "Service 'one': Method Bad5::get() must have no parameters.");
 
 
 class Bad6
@@ -123,7 +96,7 @@ Assert::exception(function () {
 	$builder = new DI\ContainerBuilder;
 	$builder->addDefinition('one')->setFactory('Bad6::create');
 	$builder->complete();
-}, Nette\InvalidStateException::class, "Method Bad6::create() used in service 'one' is not callable.");
+}, Nette\DI\ServiceCreationException::class, "Service 'one': Method Bad6::create() is not callable.");
 
 
 class Bad7
@@ -137,7 +110,7 @@ Assert::exception(function () {
 	$builder = new DI\ContainerBuilder;
 	$builder->addDefinition('one')->setFactory('Bad7::create');
 	$builder->complete();
-}, Nette\DI\ServiceCreationException::class, "Unknown type of service 'one', declare return type of factory method (for PHP 5 use annotation @return)");
+}, Nette\DI\ServiceCreationException::class, "Service 'one': Unknown service type, specify it or declare return type of factory.");
 
 
 class Bad8
@@ -203,7 +176,7 @@ Assert::exception(function () {
 	$builder = new DI\ContainerBuilder;
 	$builder->addDefinition('one')->setFactory('Bad10::method');
 	$builder->complete();
-}, Nette\InvalidStateException::class, "Method Bad10::method() used in service 'one' is not callable.");
+}, Nette\InvalidStateException::class, "Service 'one': Method Bad10::method() is not callable.");
 
 
 class ConstructorParam

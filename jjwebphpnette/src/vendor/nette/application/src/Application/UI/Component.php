@@ -26,7 +26,7 @@ abstract class Component extends Nette\ComponentModel\Container implements ISign
 {
 	use Nette\ComponentModel\ArrayAccess;
 
-	/** @var callable[]  function (self $sender); Occurs when component is attached to presenter */
+	/** @var callable[]  function (Component $sender): void; Occurs when component is attached to presenter */
 	public $onAnchor;
 
 	/** @var array */
@@ -35,11 +35,23 @@ abstract class Component extends Nette\ComponentModel\Container implements ISign
 
 	/**
 	 * Returns the presenter where this component belongs to.
-	 * @param  bool  $throw exception if presenter doesn't exist?
 	 */
-	public function getPresenter(bool $throw = true): ?Presenter
+	public function getPresenter(): ?Presenter
 	{
-		return $this->lookup(Presenter::class, $throw);
+		if (func_num_args()) {
+			trigger_error(__METHOD__ . '() parameter $throw is deprecated, use hasPresenter()', E_USER_DEPRECATED);
+			$throw = func_get_arg(0);
+		}
+		return $this->lookup(Presenter::class, $throw ?? true);
+	}
+
+
+	/**
+	 * Returns whether there is a presenter.
+	 */
+	public function hasPresenter(): bool
+	{
+		return (bool) $this->lookup(Presenter::class, false);
 	}
 
 
@@ -56,7 +68,7 @@ abstract class Component extends Nette\ComponentModel\Container implements ISign
 	protected function validateParent(Nette\ComponentModel\IContainer $parent): void
 	{
 		parent::validateParent($parent);
-		$this->monitor(Presenter::class, function (Presenter $presenter) {
+		$this->monitor(Presenter::class, function (Presenter $presenter): void {
 			$this->loadState($presenter->popGlobalParameters($this->getUniqueId()));
 			$this->onAnchor($this);
 		});

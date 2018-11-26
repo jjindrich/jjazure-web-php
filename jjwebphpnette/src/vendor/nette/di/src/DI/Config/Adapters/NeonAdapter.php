@@ -11,14 +11,15 @@ namespace Nette\DI\Config\Adapters;
 
 use Nette;
 use Nette\DI\Config\Helpers;
-use Nette\DI\Statement;
+use Nette\DI\Definitions\Reference;
+use Nette\DI\Definitions\Statement;
 use Nette\Neon;
 
 
 /**
  * Reading and generating NEON files.
  */
-final class NeonAdapter implements Nette\DI\Config\IAdapter
+final class NeonAdapter implements Nette\DI\Config\Adapter
 {
 	use Nette\SmartObject;
 
@@ -57,13 +58,16 @@ final class NeonAdapter implements Nette\DI\Config\IAdapter
 					$tmp = null;
 					foreach ($this->process($val->attributes) as $st) {
 						$tmp = new Statement(
-							$tmp === null ? $st->getEntity() : [$tmp, ltrim($st->getEntity(), ':')],
+							$tmp === null ? $st->getEntity() : [$tmp, ltrim(implode('::', (array) $st->getEntity()), ':')],
 							$st->arguments
 						);
 					}
 					$val = $tmp;
 				} else {
 					$tmp = $this->process([$val->value]);
+					if (is_string($tmp[0]) && strpos($tmp[0], '?') !== false) {
+						trigger_error('Operator ? is deprecated in config files.', E_USER_DEPRECATED);
+					}
 					$val = new Statement($tmp[0], $this->process($val->attributes));
 				}
 			}
@@ -80,7 +84,7 @@ final class NeonAdapter implements Nette\DI\Config\IAdapter
 	{
 		array_walk_recursive(
 			$data,
-			function (&$val) {
+			function (&$val): void {
 				if ($val instanceof Statement) {
 					$val = self::statementToEntity($val);
 				}
@@ -94,22 +98,33 @@ final class NeonAdapter implements Nette\DI\Config\IAdapter
 	{
 		array_walk_recursive(
 			$val->arguments,
-			function (&$val) {
+			function (&$val): void {
 				if ($val instanceof Statement) {
 					$val = self::statementToEntity($val);
+				} elseif ($val instanceof Reference) {
+					$val = '@' . $val->getValue();
 				}
 			}
 		);
-		if (is_array($val->getEntity()) && $val->getEntity()[0] instanceof Statement) {
-			return new Neon\Entity(
-				Neon\Neon::CHAIN,
-				[
-					self::statementToEntity($val->getEntity()[0]),
-					new Neon\Entity('::' . $val->getEntity()[1], $val->arguments),
-				]
-			);
-		} else {
-			return new Neon\Entity($val->getEntity(), $val->arguments);
+
+		$entity = $val->getEntity();
+		if ($entity instanceof Reference) {
+			$entity = '@' . $entity->getValue();
+		} elseif (is_array($entity)) {
+			if ($entity[0] instanceof Statement) {
+				return new Neon\Entity(
+					Neon\Neon::CHAIN,
+					[
+						self::statementToEntity($entity[0]),
+						new Neon\Entity('::' . $entity[1], $val->arguments),
+					]
+				);
+			} elseif ($entity[0] instanceof Reference) {
+				$entity = '@' . $entity[0]->getValue() . '::' . $entity[1];
+			} elseif (is_string($entity[0])) {
+				$entity = $entity[0] . '::' . $entity[1];
+			}
 		}
+		return new Neon\Entity($entity, $val->arguments);
 	}
 }

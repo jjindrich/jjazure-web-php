@@ -47,10 +47,10 @@ abstract class Presenter extends Control implements Application\IPresenter
 	/** @var int */
 	public $invalidLinkMode;
 
-	/** @var callable[]  function (Presenter $sender); Occurs when the presenter is starting */
+	/** @var callable[]  function (Presenter $sender): void; Occurs when the presenter is starting */
 	public $onStartup;
 
-	/** @var callable[]  function (Presenter $sender, IResponse $response); Occurs when the presenter is shutting down */
+	/** @var callable[]  function (Presenter $sender, IResponse $response): void; Occurs when the presenter is shutting down */
 	public $onShutdown;
 
 	/** @var bool  automatically call canonicalize() */
@@ -147,9 +147,15 @@ abstract class Presenter extends Control implements Application\IPresenter
 	/**
 	 * Returns self.
 	 */
-	final public function getPresenter(bool $throw = true): self
+	final public function getPresenter(): self
 	{
 		return $this;
+	}
+
+
+	final public function hasPresenter(): bool
+	{
+		return true;
 	}
 
 
@@ -481,7 +487,7 @@ abstract class Presenter extends Control implements Application\IPresenter
 			return [$this->layout];
 		}
 		[$module, $presenter] = Helpers::splitName($this->getName());
-		$layout = $this->layout ? $this->layout : 'layout';
+		$layout = $this->layout ?: 'layout';
 		$dir = dirname($this->getReflection()->getFileName());
 		$dir = is_dir("$dir/templates") ? $dir : dirname($dir);
 		$list = [
@@ -953,7 +959,7 @@ abstract class Presenter extends Control implements Application\IPresenter
 			}
 
 			if (!isset($args[$name])) {
-				if (!$param->isDefaultValueAvailable() && !$param->allowsNull() && $type !== 'NULL' && $type !== 'array') {
+				if (!$param->isDefaultValueAvailable() && !$param->allowsNull() && $type !== 'NULL' && $type !== 'array' && $type !== 'iterable') {
 					$missing[] = $param;
 					unset($args[$name]);
 				}

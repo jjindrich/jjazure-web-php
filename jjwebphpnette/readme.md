@@ -21,6 +21,12 @@ Change key in sourcecode:
 - change instrumentationKey in app/presenters/templates/Default.default.latte for client side analytics
 - change setInstrumentationKey in app/factories/AIFactory.php for sample backend telemetry
 
+Added Application Insights library
+
+```bash
+composer update
+```
+
 ## Prepare docker image and run
 
 ```bash
@@ -29,11 +35,3 @@ docker run -p 80:80 jjwebphpnette
 ```
 
 Open browser with url http://localhost
-
-## Deploy to Azure Container Registry
-
-TODO
-
-## Run in Azure Container Instance
-
-TODO

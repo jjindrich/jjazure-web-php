@@ -250,7 +250,7 @@ class Template
 		$block = reset($this->blockQueue[$name]);
 		if ($mod && $mod !== ($blockType = $this->blockTypes[$name])) {
 			if ($filter = (is_string($mod) ? Filters::getConvertor($blockType, $mod) : $mod)) {
-				echo $filter($this->capture(function () use ($block, $params) { $block($params); }), $blockType);
+				echo $filter($this->capture(function () use ($block, $params): void { $block($params); }), $blockType);
 				return;
 			}
 			trigger_error("Including block $name with content type " . strtoupper($blockType) . ' into incompatible type ' . strtoupper($mod) . '.', E_USER_WARNING);

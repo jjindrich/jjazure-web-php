@@ -20,6 +20,7 @@ $configurator->enableTracy(__DIR__ . '/../log');
 $configurator->setTempDirectory(__DIR__ . '/../temp');
 $configurator->createRobotLoader()
 	->addDirectory(__DIR__)
+	->addDirectory(__DIR__ . '/../vendor/microsoft')
 	->register();
 
 // Create default Dependency Injection container

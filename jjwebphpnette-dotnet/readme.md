@@ -4,13 +4,20 @@ This repository shows how to run PHP Nette (https://nette.org/en/download) frame
 
 ## Create new Nette project
 
-```bash
+```
 composer create-project nette/web-project
 composer update
+```
+
+## Run with PHP runtime
+
+Run native with PHP runtime.
+
+```
 php -S localhost:80 -t www
 ```
 
-## Add dotNet runtime
+## Add DotNet runtime with PeachPie
 
 
 ## Add Application Insights telemetry

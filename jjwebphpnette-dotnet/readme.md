@@ -5,7 +5,8 @@ This repository shows how to run PHP Nette (https://nette.org/en/download) frame
 ## Create new Nette project
 
 ```
-composer create-project nette/web-project
+composer create-project nette/web-project jjnette
+cd jjnette
 composer update
 ```
 

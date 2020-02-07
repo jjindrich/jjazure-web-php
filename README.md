@@ -5,21 +5,28 @@ Container is hosted in Azure Web App.
 ![Image](media/screen.png)
 
 ## Create docker image
-Define first dockerfile based on <a href="https://hub.docker.com/_/php/">documentation</a>.
+
+Define first dockerfile based on [documentation](https://hub.docker.com/_/php/).
 We have dockerfile with simple php webpage.
 
 ### Compile image
-Get sourcecode from this repository and run:
-```
+
+Get sourcecode from this repository and run. Dockerfile compiles resources to be working with Web App, check this [link](https://docs.microsoft.com/en-us/azure/app-service/containers/tutorial-custom-docker-image).
+
+```bash
 docker build jjwebphp -t jjwebphp
 docker images
 ```
-### Test image
+
+### Test image locally
+
 Run docker image locally, check you have docker support on your machine.
+
+```bash
+docker run -it -p 80:80 jjwebphp
 ```
-docker run -p 80:80 jjwebphp
-```
-Run browser with <a href="http://localhost">http://localhost</a>
+
+Run browser with [http://localhost](http://localhost)
 
 ## Upload image into docker repository
 We will use Azure Container Repository service.
@@ -91,5 +98,5 @@ Or you can use json definition from charts folder.
 
 After several minutes there will be published external IP on AKS dashboard.
 
-More details how to leverage AKS use this repo https://github.com/valda-z/aks-playground
+More details how to leverage AKS use this repo https://github.com/jjindrich/jjazure-web-dotnetcore
 

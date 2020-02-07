@@ -4,4 +4,5 @@ set -e
 echo "Starting SSH ..."
 service ssh start
 
-php /var/www/php/index.php
+echo "Starting webserver ..."
+apache2-foreground

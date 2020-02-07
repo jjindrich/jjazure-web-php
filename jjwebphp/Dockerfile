@@ -1,5 +1,5 @@
 FROM php:7.4-apache
-COPY src/ /var/www/php
+COPY src/ /var/www/html
 
 # section for WebApp SSH console
 # https://docs.microsoft.com/en-us/azure/app-service/containers/tutorial-custom-docker-image

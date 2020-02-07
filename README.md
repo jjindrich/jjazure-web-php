@@ -29,48 +29,49 @@ docker run -it -p 80:80 jjwebphp
 Run browser with [http://localhost](http://localhost)
 
 ## Upload image into docker repository
+
 We will use Azure Container Repository service.
-Create new service with name jjreg.azurecr.io
+Create new service with name jjcontainers.azurecr.io
 
 Login into new Azure Container Repository with provided credetials - found on Access keys
-```
-docker login jjreg.azurecr.io -u jjreg -p <password>
-```
-Tag your docker image and upload image into repository. You 
-```
-docker tag jjwebphp jjreg.azurecr.io/jjwebphp
-docker push jjreg.azurecr.io/jjwebphp
+
+```bash
+docker login jjcontainers.azurecr.io -u jjcontainers -p <password>
+docker tag jjwebphp jjcontainers.azurecr.io/jjwebphp
+docker push jjcontainers.azurecr.io/jjwebphp
 ```
 
 ## Create Azure Web App for containers
+
 Browse Azure portal and create new service Web App for Containers (Microsoft publisher) - name jjweblinux.
 Select Azure Container Repository, specify images and click Create.
 ![Image](media/webapp.png)
 
-Browse website <a href="http://jjweblinux.azurewebsites.net">http://jjweblinux.azurewebsites.net</a>
+Browse website [http://jjweblinux.azurewebsites.net](http://jjweblinux.azurewebsites.net)
 
 ## Monitor with Application Insights
+
 Azure Application Insights gives you great telemetry about using your website (jjwebphpai).
-To enable it, go to Web App, select Monitoring section and enable AI. The resource in Azure will be created. 
-Use <a href="https://github.com/Microsoft/ApplicationInsights-php">Application Insights for PHP</a> extension.
+To enable it, go to Web App, select Monitoring section and enable AI. The resource in Azure will be created.
+Use [Application Insights for PHP](https://github.com/Microsoft/ApplicationInsights-php) extension.
 
 ### Install PHP composer
+
 Install PHP composer to get Application Insights packages.
 https://getcomposer.org/download/
 
-### Compile PHP project
-```
+### Compile PHP project and compile image
+
+```bash
 cd jjwebphpai/src
 php ~/composer.phar install
-```
 
-## Compile image
-```
 docker build jjwebphpai -t jjwebphp
 docker images
 ```
 
-# JJWeb PHP site in Azure Web App with PHP
+## JJWeb PHP site in Azure Web App with PHP
+
 This project contains simple PHP website. This website is running in Azure Web App with enabled PHP framework.
 
 How to deploy in Web App ?
@@ -79,17 +80,18 @@ https://docs.microsoft.com/en-us/azure/app-service/app-service-web-get-started-p
 How to customize Web App settings ?
 https://docs.microsoft.com/en-us/azure/app-service/web-sites-php-configure
 
+## JJWeb PHP site in Azure Kubernetes Service
 
-# JJWeb PHP site in Azure Kubernetes Service
 Compile image and publish into Azure Container Registry associated with Azure Kubernetes Service (AKS).
 
-```
+```bash
 docker build jjwebphpai -t jjwebphpai
 docker tag jjwebphpai jjdotnetcoreaf9d.azurecr.io/jjwebphpai:1
 ddocker push jjdotnetcoreaf9d.azurecr.io/jjwebphpai
 ```
 
 Publish service in AKS
+
 - Run AKS dashboard
 - Select Overview and Create an App
 - Type your container and Service External
@@ -99,4 +101,3 @@ Or you can use json definition from charts folder.
 After several minutes there will be published external IP on AKS dashboard.
 
 More details how to leverage AKS use this repo https://github.com/jjindrich/jjazure-web-dotnetcore
-

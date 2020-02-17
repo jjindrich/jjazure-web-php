@@ -1,0 +1,9 @@
+RewriteEngine On
+
+RewriteBase /
+# Rewrite static files that live in www/
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)\.(woff|ttf|svg|js|ico|gif|jpg|png|css|htc|xml|txt|pdf)$ /www/$1.$2 [L,NC]
+# Redirect all other URLs to www/index.php
+RewriteRule ^((?!www/).*)$ www/index.php/$1 [L,QSA]

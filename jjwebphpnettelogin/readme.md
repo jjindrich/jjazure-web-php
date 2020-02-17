@@ -7,6 +7,8 @@
 
 ## Run locally
 
+Create new file app\config\local.neon
+
 ```bash
 composer update
 php -S localhost:80 -t www

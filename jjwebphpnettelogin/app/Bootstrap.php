@@ -27,6 +27,8 @@ class Bootstrap
 			->addConfig(__DIR__ . '/config/common.neon')
 			->addConfig(__DIR__ . '/config/local.neon');
 
+//		bdump($_SERVER);				
+
 		return $configurator;
 	}
 

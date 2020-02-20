@@ -13,8 +13,7 @@ final class HomepagePresenter extends BasePresenter
         $f = new Form();
         $f->addSubmit('click', 'Click me to redirect.');
         $f->onSuccess[] = function() {
-            //$this->redirect('Sign:in');
-            $this->redirectUrl('https://web.jjdev.org/sign/in');
+            $this->redirect('Sign:in');
         };
         return $f;
     }

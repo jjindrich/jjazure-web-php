@@ -36,5 +36,14 @@ dotnet run bin/Debug/netcoreapp3.1/mysqltest.dll
 
 ```bash
 Connecting mySql...
-Executed in 00:00:00.4223733
+Executed in 00:00:00.4345362
+Executed in 00:00:00.0089680
+Executed in 00:00:00.0028932
+Executed in 00:00:00.0023729
+Executed in 00:00:00.0026272
+Executed in 00:00:00.0024963
+Executed in 00:00:00.0019841
+Executed in 00:00:00.0028826
+Executed in 00:00:00.0023343
+Executed in 00:00:00.0025311
 ```

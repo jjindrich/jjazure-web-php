@@ -10,7 +10,14 @@ namespace src_dotnet
         {
             Console.WriteLine("Connecting mySql...");
             string yourConnectionString = "Server=jjtestmysql.mysql.database.azure.com; Port=3306; Database=jj; Uid=jj@jjtestmysql; Pwd=Azure-12345; SslMode=Preferred;";
-            using var connection = new MySqlConnection(yourConnectionString);
+
+            for (int i = 1; i <= 10; i++)
+                await Connect(yourConnectionString);
+        }
+
+        private async static Task Connect(string connstr)
+        {
+            using var connection = new MySqlConnection(connstr);
 
             DateTime time_start = DateTime.Now;
             await connection.OpenAsync();

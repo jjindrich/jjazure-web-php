@@ -2,6 +2,11 @@
 
 ## Deployment in Azure
 
+It creates
+
+- Azure Database for MySql (without SSL enforcement)
+- Virtual Machine Ubuntu
+
 Run ARM deployment [deploy.ps1](/arm-deploy/deploy.ps1)
 
 Login into VM with SSH and run [install.sh](/src-php/install.ps1)
@@ -20,4 +25,16 @@ Query in 0.00077986717224121 seconds
 real    0m0.063s
 user    0m0.008s
 sys     0m0.008s
+```
+
+## Run connectivity test with DotNet Core
+
+```bash
+dotnet build .
+dotnet run bin/Debug/netcoreapp3.1/mysqltest.dll
+```
+
+```bash
+Connecting mySql...
+Executed in 00:00:00.4223733
 ```

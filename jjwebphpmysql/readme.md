@@ -15,16 +15,20 @@ Login into VM with SSH and run [install.sh](/src-php/install.ps1)
 
 ```bash
 watch -n 1 time php -f select.php
+php -f select.php
 ```
 
 ```bash
-Connected in 0.04810905456543 seconds
-Reading data from table...
-Query in 0.00077986717224121 seconds
-
-real    0m0.063s
-user    0m0.008s
-sys     0m0.008s
+Connected in 0.04613208770752 seconds
+Connected in 0.036362886428833 seconds
+Connected in 0.04773998260498 seconds
+Connected in 0.047152996063232 seconds
+Connected in 0.054957866668701 seconds
+Connected in 0.037756204605103 seconds
+Connected in 0.035069942474365 seconds
+Connected in 0.038208961486816 seconds
+Connected in 0.049767017364502 seconds
+Connected in 0.036150932312012 seconds
 ```
 
 ## Run connectivity test with DotNet Core

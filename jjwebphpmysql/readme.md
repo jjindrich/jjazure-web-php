@@ -1,12 +1,12 @@
 # JJWeb PHP with MySql
 
-## Deployment
+## Deployment in Azure
 
-Run ARM deployment deploy.ps1
+Run ARM deployment [deploy.ps1](/arm-deploy/deploy.ps1)
 
-Login VM ssh and run install.sh
+Login into VM with SSH and run [install.sh](/src-php/install.ps1)
 
-## Run test
+## Run connectivity test
 
 ```bash
 watch -n 1 time php -f select.php
@@ -14,7 +14,7 @@ watch -n 1 time php -f select.php
 
 ```bash
 Connected in 0.04810905456543 seconds
-Reading data from table:
+Reading data from table...
 Query in 0.00077986717224121 seconds
 
 real    0m0.063s

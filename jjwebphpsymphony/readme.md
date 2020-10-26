@@ -4,7 +4,8 @@
 
 It creates
 
-- Azure Database for MySql (without SSL enforcement)
+- Azure Database for MySql or for MariaDB (without SSL enforcement)
+- Azure Web App for PHP
 
 Run ARM deployment [deploy.ps1](/arm-deploy/deploy.ps1)
 
@@ -93,6 +94,7 @@ Find Header X-Debug-Token-Link: like http://jjphp.azurewebsites.net/_profiler/a5
 
 ![Debug](.images/debug.png)
 
-To reduce mySql connection time we changed driver to mysqli, check results
+To reduce mySql connection time we changed driver to mysqli, check results.
+Getting same results wit Azure Database with MariaDb.
 
 ![Debug](.images/debug-mysqli.png)

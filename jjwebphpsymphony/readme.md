@@ -84,3 +84,11 @@ git push azure master
 ```
 
 Login into Azure Web App SSH and copy .htaccess.azure
+
+## Results
+
+Call https://jjphp.azurewebsites.net/product/1
+
+Find Header X-Debug-Token-Link: like http://jjphp.azurewebsites.net/_profiler/a5a4d9
+
+![Debug](/.images/debug.png)

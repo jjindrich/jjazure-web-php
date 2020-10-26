@@ -1,0 +1,9 @@
+RewriteEngine On
+
+RewriteBase /
+# Rewrite static files that live in public/
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)\.(woff|ttf|svg|js|ico|gif|jpg|png|css|htc|xml|txt|pdf)$ /public/$1.$2 [L,NC]
+# Redirect all other URLs to public/index.php
+RewriteRule ^((?!public/).*)$ public/index.php/$1 [L,QSA]

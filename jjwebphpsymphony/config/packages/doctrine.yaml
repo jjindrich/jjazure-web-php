@@ -1,8 +1,10 @@
 doctrine:
     dbal:
         #url: '%env(resolve:DATABASE_URL)%'
-        driver: pdo_mysql
-        host: jjtestmysql.mysql.database.azure.com
+        #driver: pdo_mysql
+        #host: jjtestmysql.mysql.database.azure.com
+        driver: mysqli
+        host: p:jjtestmysql.mysql.database.azure.com
         port: 3306
         dbname: jjdb
         user: jj@jjtestmysql

@@ -92,3 +92,7 @@ Call https://jjphp.azurewebsites.net/product/1
 Find Header X-Debug-Token-Link: like http://jjphp.azurewebsites.net/_profiler/a5a4d9
 
 ![Debug](.images/debug.png)
+
+To reduce mySql connection time we changed driver to mysqli, check results
+
+![Debug](.images/debug-mysqli.png)

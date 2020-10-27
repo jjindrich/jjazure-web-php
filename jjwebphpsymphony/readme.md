@@ -84,6 +84,9 @@ Next configure key in /config/packages/appinsights.yaml
 Run website and check Azure Application Insights
 ![AppInsights](.images/appinsights-perf.png)
 
+...but it takes some resources to send telemetry...
+![AppInsights](.images/appinsights-debug.png)
+
 ## Deploy webapp to Azure
 
 ### Update Azure Database for mySql

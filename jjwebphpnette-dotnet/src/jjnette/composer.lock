@@ -80,23 +80,23 @@
         },
         {
             "name": "nette/application",
-            "version": "v2.4.13",
+            "version": "v2.4.16",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nette/application.git",
-                "reference": "023acd964383de11fbc32cae8f4dfd8043643a0f"
+                "reference": "e32c04de211873c792d13d9a00c50083b8e05a23"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nette/application/zipball/023acd964383de11fbc32cae8f4dfd8043643a0f",
-                "reference": "023acd964383de11fbc32cae8f4dfd8043643a0f",
+                "url": "https://api.github.com/repos/nette/application/zipball/e32c04de211873c792d13d9a00c50083b8e05a23",
+                "reference": "e32c04de211873c792d13d9a00c50083b8e05a23",
                 "shasum": ""
             },
             "require": {
                 "nette/component-model": "^2.3",
                 "nette/http": "^2.2",
                 "nette/reflection": "^2.2",
-                "nette/utils": "^2.4 || ~3.0.0",
+                "nette/utils": "^2.4",
                 "php": ">=5.6.0"
             },
             "conflict": {
@@ -107,7 +107,7 @@
             },
             "require-dev": {
                 "latte/latte": "^2.4.3",
-                "mockery/mockery": "^0.9.5",
+                "mockery/mockery": "^1.0",
                 "nette/di": "^2.4",
                 "nette/forms": "^2.4",
                 "nette/robot-loader": "^2.4.2 || ^3.0",
@@ -128,9 +128,6 @@
             "autoload": {
                 "classmap": [
                     "src/"
-                ],
-                "files": [
-                    "src/compatibility.php"
                 ]
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -149,7 +146,7 @@
                     "homepage": "https://nette.org/contributors"
                 }
             ],
-            "description": "? Nette Application: a full-stack component-based MVC kernel for PHP that helps you write powerful and modern web applications. Write less, have cleaner code and your work will bring you joy.",
+            "description": "🏆 Nette Application: a full-stack component-based MVC kernel for PHP that helps you write powerful and modern web applications. Write less, have cleaner code and your work will bring you joy.",
             "homepage": "https://nette.org",
             "keywords": [
                 "Forms",
@@ -163,7 +160,7 @@
                 "routing",
                 "seo"
             ],
-            "time": "2018-11-23T22:28:11+00:00"
+            "time": "2020-08-25T01:51:49+00:00"
         },
         {
             "name": "nette/bootstrap",
@@ -232,7 +229,7 @@
                     "homepage": "https://nette.org/contributors"
                 }
             ],
-            "description": "🅱 Nette Bootstrap: the simple way to configure and bootstrap your Nette application.",
+            "description": "? Nette Bootstrap: the simple way to configure and bootstrap your Nette application.",
             "homepage": "https://nette.org",
             "keywords": [
                 "bootstrapping",
@@ -564,7 +561,7 @@
                     "homepage": "https://nette.org/contributors"
                 }
             ],
-            "description": "🔍 Nette Finder: find files and directories with an intuitive API.",
+            "description": "? Nette Finder: find files and directories with an intuitive API.",
             "homepage": "https://nette.org",
             "keywords": [
                 "filesystem",
@@ -832,7 +829,7 @@
                     "homepage": "https://nette.org/contributors"
                 }
             ],
-            "description": "🍸 Nette NEON: encodes and decodes NEON file format.",
+            "description": "? Nette NEON: encodes and decodes NEON file format.",
             "homepage": "http://ne-on.org",
             "keywords": [
                 "export",
@@ -895,7 +892,7 @@
                     "homepage": "https://nette.org/contributors"
                 }
             ],
-            "description": "🐘 Nette PHP Generator: generates neat PHP code for you. Supports new PHP 7.1 features.",
+            "description": "? Nette PHP Generator: generates neat PHP code for you. Supports new PHP 7.1 features.",
             "homepage": "https://nette.org",
             "keywords": [
                 "code",
@@ -967,6 +964,7 @@
                 "nette",
                 "reflection"
             ],
+            "abandoned": true,
             "time": "2017-07-11T19:28:57+00:00"
         },
         {
@@ -1160,7 +1158,7 @@
                     "homepage": "https://nette.org/contributors"
                 }
             ],
-            "description": "🛠 Nette Utils: lightweight utilities for string & array manipulation, image handling, safe JSON encoding/decoding, validation, slug or strong password generating etc.",
+            "description": "? Nette Utils: lightweight utilities for string & array manipulation, image handling, safe JSON encoding/decoding, validation, slug or strong password generating etc.",
             "homepage": "https://nette.org",
             "keywords": [
                 "array",
@@ -1295,7 +1293,7 @@
                     "homepage": "https://nette.org/contributors"
                 }
             ],
-            "description": "Nette Tester: enjoyable unit testing in PHP with code coverage reporter. 🍏🍏🍎🍏",
+            "description": "Nette Tester: enjoyable unit testing in PHP with code coverage reporter. ????",
             "homepage": "https://tester.nette.org",
             "keywords": [
                 "Xdebug",
@@ -1322,5 +1320,6 @@
     "platform-dev": [],
     "platform-overrides": {
         "php": "5.6"
-    }
+    },
+    "plugin-api-version": "1.1.0"
 }

@@ -15,7 +15,7 @@ Setup dev machine
 
 - install Symfony CLI
 - https://symfony.com/doc/current/setup.html#technical-requirements
-- Visual Studio Code extension Symfony for VSCode
+- check Visual Studio Code extensions for Symfony
 
 ```bash
 sudo apt-get install php
@@ -65,6 +65,24 @@ composer require --dev symfony/profiler-pack
 ```
 
 Check application running http://127.0.0.1:8000/product
+
+### Monitor with Azure Application Insights
+
+We will use this AppInsights PHP bundle https://github.com/app-insights-php/app-insights-php-bundle
+
+*It uses package microsoft/application-insights which is abandoned.*
+
+```bash
+composer require app-insights-php/doctrine-dependency-logger
+composer require app-insights-php/app-insights-php-bundle
+```
+
+and check /config/bundles.php for AppInsightsPHP\Symfony\AppInsightsPHPBundle\AppInsightsPHPBundle
+
+Next configure key in /config/packages/appinsights.yaml
+
+Run website and check Azure Application Insights
+![AppInsights](.images/appinsights-perf.png)
 
 ## Deploy webapp to Azure
 

@@ -31,6 +31,21 @@ Connected in 0.049767017364502 seconds
 Connected in 0.036150932312012 seconds
 ```
 
+If you use **persistent connections**, you will get better performance:
+
+```bash
+Connected in 0.046870946884155 seconds
+Connected in 0.0019738674163818 seconds
+Connected in 0.0019018650054932 seconds
+Connected in 0.0018720626831055 seconds
+Connected in 0.0020480155944824 seconds
+Connected in 0.0020530223846436 seconds
+Connected in 0.0018038749694824 seconds
+Connected in 0.0020110607147217 seconds
+Connected in 0.0025179386138916 seconds
+Connected in 0.0014710426330566 seconds
+```
+
 ## Run connectivity test with DotNet Core
 
 ```bash

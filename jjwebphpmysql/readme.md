@@ -9,7 +9,7 @@ It creates
 
 Run ARM deployment [deploy.ps1](/arm-deploy/deploy.ps1)
 
-Login into VM with SSH and run [install.sh](/src-php/install.ps1)
+Login into VM with SSH and run [install.sh](/src-php/install.sh)
 
 ## Run connectivity test
 

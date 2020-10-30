@@ -7,9 +7,9 @@ It creates
 - Azure Database for MySql (without SSL enforcement)
 - Virtual Machine Ubuntu
 
-Run ARM deployment [deploy.ps1](/arm-deploy/deploy.ps1)
+Run ARM deployment [deploy.ps1](arm-deploy/deploy.ps1)
 
-Login into VM with SSH and run [install.sh](/src-php/install.sh)
+Login into VM with SSH and run [install.sh](src-php/install.sh)
 
 ## Run connectivity test
 

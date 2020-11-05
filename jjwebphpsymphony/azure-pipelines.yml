@@ -6,10 +6,13 @@ trigger:
     - '*'
   paths:
     include:
-    -  jjwebphpsymfony/*
+    -  jjwebphpsymphony/*
 
 pool:
   vmImage: 'ubuntu-latest'
+
+variables:
+    subscription: 'jjphp - 1 - Azure'
 
 stages:
 - stage: Build
@@ -28,12 +31,32 @@ stages:
       inputs:
         rootFolder: jjwebphpsymphony/
         includeRootFolder: false
-        archiveType: zip
-    steps:
+        archiveType: default
     - task: PublishBuildArtifacts@1
       displayName: 'Publish Artifact: drop'
       
-#- stage: DeployTEST
-#  displayName: Deploy to TEST
-#  dependsOn: Build
-
+- stage: DeployTEST
+  displayName: Deploy to TEST
+  dependsOn: Build
+  jobs:
+    - deployment: DeployTESTWEBAPP
+      displayName: Deploy to Azure Web App
+      environment: 'jjphp-TEST'
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+              - task: DownloadPipelineArtifact@2
+                inputs:
+                  artifact: drop
+                  path: $(Pipeline.Workspace)/drop
+              - task: AzureRmWebAppDeployment@4
+                displayName: 'Deploy Azure App Service'
+                inputs:
+                  azureSubscription: $(subscription)
+                  appType: webAppLinux
+                  WebAppName: jjphp
+                  packageForLinux: $(Pipeline.Workspace)/drop/**/*.zip
+                  RuntimeStack: 'PHP|7.4'
+                  ScriptType: 'Inline Script'
+                  InlineScript: cp /home/site/wwwroot/.htaccess.azure /home/site/wwwroot/.htaccess         

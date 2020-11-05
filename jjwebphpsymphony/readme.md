@@ -128,6 +128,11 @@ Check DevOps tasks:
 
 - Deploy to Azure Web App https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/deploy/azure-rm-web-app-deployment
 
-You can find my YAML definition [azure-pipelines.yml](azure-pipelines.yml)
+You can find my YAML definition [azure-pipelines.yml](azure-pipelines.yml) and import it.
 
 ![Azure DevOps](.images/devops-cicd.png)
+
+Possible future improvements
+
+- deploy Azure Web App with ARM for unittest
+- deploy to [Azure Web App Deployment Slot](https://docs.microsoft.com/en-us/azure/app-service/deploy-staging-slots) and in next stage switch slot

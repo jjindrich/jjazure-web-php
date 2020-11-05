@@ -119,3 +119,15 @@ To reduce mySql connection time we changed driver to mysqli, check results.
 Getting same results wit Azure Database with MariaDb.
 
 ![Debug](.images/debug-mysqli.png)
+
+## Deploy with Azure DevOps
+
+If you want automate deployment, check [Azure DevOps](https://dev.azure.com).
+
+Check DevOps tasks:
+
+- Deploy to Azure Web App https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/deploy/azure-rm-web-app-deployment
+
+You can find my YAML definition [azure-pipelines.yml](azure-pipelines.yml)
+
+![Azure DevOps](.images/devops-cicd.png)

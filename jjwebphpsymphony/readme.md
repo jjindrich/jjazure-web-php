@@ -130,7 +130,7 @@ Check DevOps tasks:
 
 You can find my YAML definition [azure-pipelines.yml](azure-pipelines.yml) and import it.
 
-![Azure DevOps](.images/devops-cicd.png)
+![Azure DevOps](.images/devops-run.png)
 
 Possible future improvements
 

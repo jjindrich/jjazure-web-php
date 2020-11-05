@@ -12,7 +12,7 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-    subscription: 'jjphp - 1 - Azure'
+    subscription: 'jjdevteamproject-jjazure-web-php'
 
 stages:
 - stage: Build

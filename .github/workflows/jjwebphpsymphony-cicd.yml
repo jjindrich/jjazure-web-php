@@ -1,6 +1,8 @@
 name: jjwebphpsymphony-cicd
 
 on:
+  worklow_dispatch
+  
   push:
     branches: [ master ]
     paths: ./jjwebphpsymphony

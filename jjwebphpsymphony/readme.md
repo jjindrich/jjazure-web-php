@@ -136,3 +136,21 @@ Possible future improvements
 
 - deploy Azure Web App with ARM for unittest
 - deploy to [Azure Web App Deployment Slot](https://docs.microsoft.com/en-us/azure/app-service/deploy-staging-slots) and in next stage switch slot
+
+## Deploy with GitHub Actions
+
+If you want automate deployment, check [GitHub Actions](https://docs.github.com/en/free-pro-team@latest/actions).
+
+How to enable CI/CD with GitHub Actions and Azure Web App https://docs.microsoft.com/en-us/azure/app-service/deploy-github-actions
+
+Check Actions tasks:
+
+- Allow to run manually https://docs.github.com/en/free-pro-team@latest/actions/reference/events-that-trigger-workflows#workflow_dispatch
+- Action for Azure https://docs.microsoft.com/en-us/azure/developer/github/github-actions
+- Deploy to Azure Web App https://github.com/Azure/webapps-deploy
+
+You can find my YAML definition [jjwebphpsymphony-cicd.yml](/.github/workflows/jjwebphpsymphony-cicd.yml) and import it.
+
+**Deployment for PHP is not supported now**
+
+![GitHub Actions](.images/actions-unsupported.png)

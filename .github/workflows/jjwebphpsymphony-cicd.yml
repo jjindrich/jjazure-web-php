@@ -1,4 +1,4 @@
-name: PHP Composer
+name: jjwebphpsymphony-cicd
 
 on:
   push:

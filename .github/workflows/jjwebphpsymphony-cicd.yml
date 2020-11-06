@@ -2,7 +2,14 @@ name: jjwebphpsymphony-cicd
 
 on:
   workflow_dispatch:  
-  
+    inputs:
+      logLevel:
+        description: 'Log level'     
+        required: true
+        default: 'warning'
+      tags:
+        description: 'Test scenario tags'
+          
   push:
     branches: [ master ]
     paths: ./jjwebphpsymphony

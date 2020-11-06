@@ -12,14 +12,14 @@ jobs:
   build:
   
     runs-on: ubuntu-latest
-    env:
-      working-directory: jjwebphpsymphony
+
 
     steps:
     - uses: actions/checkout@v2
 
     - name: Validate composer.json and composer.lock
       run: composer validate
+      working-directory: ./jjwebphpsymphony
 
     - name: Cache Composer packages
       id: composer-cache

@@ -20,6 +20,7 @@ jobs:
 
     - name: Validate composer.json and composer.lock
       run: composer validate
+      working-directory: ./jjwebphpsymphony
 
     - name: Cache Composer packages
       id: composer-cache

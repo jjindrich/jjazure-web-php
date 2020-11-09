@@ -1,0 +1,25 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "databaseUser": {
+          "value": "jj"
+      },
+      "databasePassword": {
+          "value": "Azure-12345"
+      },
+      "databaseName": {
+          "value": "jj"
+      },
+      "mysqlShareName": {
+          "value": "jjtestmysqlshare"
+      },
+      "mysqlContainerName": {
+          "value": "jjtestmysql"
+      },
+      "storageAccountName": {
+        "value": "jjtestmysqlstorage"
+      }
+    }
+  }
+  

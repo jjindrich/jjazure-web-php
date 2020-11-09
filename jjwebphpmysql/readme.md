@@ -66,3 +66,41 @@ Executed in 00:00:00.0028826
 Executed in 00:00:00.0023343
 Executed in 00:00:00.0025311
 ```
+
+## Run connectivity test to mySql running in container
+
+Provision mySql on Azure Container Instance and update connection string to jjtestmysql.westeurope.azurecontainer.io
+
+```bash
+php -f select.php
+```
+
+Results mysqli driver without persistent connections
+
+```bash
+Connected in 0.010722875595093 seconds
+Connected in 0.0086610317230225 seconds
+Connected in 0.0086190700531006 seconds
+Connected in 0.008882999420166 seconds
+Connected in 0.0092010498046875 seconds
+Connected in 0.0092408657073975 seconds
+Connected in 0.0090560913085938 seconds
+Connected in 0.010896921157837 seconds
+Connected in 0.0089740753173828 seconds
+Connected in 0.012285947799683 seconds
+```
+
+Results mysqli driver with persistent connections
+
+```bash
+Connected in 0.012356042861938 seconds
+Connected in 0.0045828819274902 seconds
+Connected in 0.0053219795227051 seconds
+Connected in 0.0049490928649902 seconds
+Connected in 0.0047738552093506 seconds
+Connected in 0.0053098201751709 seconds
+Connected in 0.005108118057251 seconds
+Connected in 0.0053060054779053 seconds
+Connected in 0.009221076965332 seconds
+Connected in 0.0051779747009277 seconds
+```

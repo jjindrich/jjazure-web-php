@@ -1,0 +1,175 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "storageAccountType": {
+            "type": "string",
+            "defaultValue": "Standard_LRS",
+            "allowedValues": [
+                "Standard_LRS",
+                "Standard_GRS",
+                "Standard_ZRS"
+            ],
+            "metadata": {
+                "description": "Storage Account type"
+            }
+        },
+        "storageAccountName": {
+            "type": "string"
+        },
+        "mysqlShareName": {
+            "type": "string"
+        },
+        "mysqlContainerName": {
+            "type": "string"
+        },
+        "databaseUser": {
+            "type": "string"
+        },
+        "databasePassword": {
+            "type": "securestring"
+        },
+        "databaseName": {
+            "type": "string"
+        }
+    },
+    "variables": {
+        "shareContainerGroupName": "createshare-container-instance",
+        "mysqlContainerGroupName": "mysql-container-instance",
+        "mysqlShareName": "[parameters('mysqlShareName')]",
+        "mysqlContainerName": "[parameters('mysqlContainerName')]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "name": "[parameters('storageAccountName')]",
+            "apiVersion": "2017-10-01",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "[parameters('storageAccountType')]"
+            },
+            "kind": "Storage",
+            "properties": {}
+        },
+        {
+            "name": "[variables('shareContainerGroupName')]",
+            "type": "Microsoft.ContainerInstance/containerGroups",
+            "apiVersion": "2018-10-01",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[concat('Microsoft.Storage/storageAccounts/', parameters('storageAccountName'))]"
+            ],
+            "properties": {
+                "containers": [
+                    {
+                        "name": "[variables('mysqlShareName')]",
+                        "properties": {
+                            "image": "microsoft/azure-cli",
+                            "command": [
+                                "az",
+                                "storage",
+                                "share",
+                                "create",
+                                "--name",
+                                "[variables('mysqlShareName')]"
+                            ],
+                            "environmentVariables": [
+                                {
+                                    "name": "AZURE_STORAGE_KEY",
+                                    "value": "[listKeys(parameters('storageAccountName'),'2017-10-01').keys[0].value]"
+                                },
+                                {
+                                    "name": "AZURE_STORAGE_ACCOUNT",
+                                    "value": "[parameters('storageAccountName')]"
+                                }
+                            ],
+                            "resources": {
+                                "requests": {
+                                    "cpu": 1,
+                                    "memoryInGb": 1
+                                }
+                            }
+                        }
+                    }
+                ],
+                "restartPolicy": "OnFailure",
+                "osType": "Linux"
+            }
+        },
+        {
+            "type": "Microsoft.ContainerInstance/containerGroups",
+            "name": "[variables('mysqlContainerGroupName')]",
+            "apiVersion": "2018-10-01",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[concat('Microsoft.ContainerInstance/containerGroups/', variables('shareContainerGroupName'))]"
+            ],
+            "properties": {
+                "containers": [
+                    {
+                        "name": "[variables('mysqlContainerName')]",
+                        "properties": {
+                            "image": "mysql:5.7",
+                            "resources": {
+                                "requests": {
+                                    "cpu": 2,
+                                    "memoryInGb": 4
+                                }
+                            },
+                            "ports": [
+                                {
+                                    "port": 3306
+                                }
+                            ],
+                            "volumeMounts": [
+                                {
+                                    "name": "mysql-data",
+                                    "mountPath": "/bitnami"
+                                }
+                            ],
+                            "environmentVariables": [
+                                {
+                                    "name": "MYSQL_ROOT_PASSWORD",
+                                    "value": "[parameters('databasePassword')]"
+                                },
+                                {
+                                    "name": "MYSQL_USER",
+                                    "value": "[parameters('databaseUser')]"
+                                },
+                                {
+                                    "name": "MYSQL_PASSWORD",
+                                    "value": "[parameters('databasePassword')]"
+                                },
+                                {
+                                    "name": "MYSQL_DATABASE",
+                                    "value": "[parameters('databaseName')]"
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "osType": "Linux",
+                "ipAddress": {
+                    "type": "Public",
+                    "ports": [
+                        {
+                            "protocol": "tcp",
+                            "port": 3306
+                        }
+                    ],
+                    "dnsNameLabel": "jjtestmysql"
+                },
+                "volumes": [
+                    {
+                        "azureFile": {
+                            "shareName": "[variables('mysqlShareName')]",
+                            "storageAccountKey": "[listKeys(parameters('storageAccountName'),'2017-10-01').keys[0].value]",
+                            "storageAccountName": "[parameters('storageAccountName')]"
+                        },
+                        "name": "mysql-data"
+                    }
+                ]
+            }
+        }
+    ]
+}

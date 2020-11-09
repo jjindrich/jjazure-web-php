@@ -9,7 +9,7 @@ on:
 
 env:
   AZURE_WEBAPP_NAME: jjphp
-  AZURE_WEBAPP_PACKAGE_PATH: '.'
+  AZURE_WEBAPP_PACKAGE_PATH: './jjwebphpsymphony'
 
 jobs:  
      
@@ -23,6 +23,10 @@ jobs:
       
     - name: Composer Install
       run: composer install
+      working-directory: ./jjwebphpsymphony
+    
+    - name: .htaccess configure
+      run: cp .htaccess.azure .htaccess
       working-directory: ./jjwebphpsymphony
     
     - name: 'Deploy to Azure WebApp'

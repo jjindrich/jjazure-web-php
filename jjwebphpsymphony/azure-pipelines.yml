@@ -38,7 +38,7 @@ stages:
 - stage: DeployTEST
   displayName: Deploy to TEST
   dependsOn: Build
-  condition: and(succeeded('Build')
+  condition: and(succeeded('Build'))
   jobs:
     - deployment: DeployTESTWEBAPP
       displayName: Deploy to Azure Web App

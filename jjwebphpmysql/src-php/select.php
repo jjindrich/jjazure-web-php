@@ -1,10 +1,5 @@
 <?php
-# with persistent connection
-$host = 'p:jjtestmysql.mysql.database.azure.com';
-#$host = 'jjtestmysql.mysql.database.azure.com';
-$username = 'jj@jjtestmysql';
-$password = 'Azure-12345';
-$db_name = 'jj';
+require("config.inc.php")
 
 for ($i = 1; $i <= 10; $i++) {
     $time_start = microtime(true);

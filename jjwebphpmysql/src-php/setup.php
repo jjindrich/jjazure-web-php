@@ -1,8 +1,5 @@
 <?php
-$host = 'jjtestmysql.mysql.database.azure.com';
-$username = 'jj@jjtestmysql';
-$password = 'Azure-12345';
-$db_name = 'jj';
+require("config.inc.php")
 
 //Establishes the connection
 $conn = mysqli_init();

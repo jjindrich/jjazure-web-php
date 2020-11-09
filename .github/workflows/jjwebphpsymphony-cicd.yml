@@ -25,6 +25,10 @@ jobs:
       run: composer install
       working-directory: ./jjwebphpsymphony
     
+    - name: .htaccess configure
+      run: cp .htaccess.azure .htaccess
+      working-directory: ./jjwebphpsymphony
+    
     - name: 'Deploy to Azure WebApp'
       uses: azure/webapps-deploy@v2
       with: 

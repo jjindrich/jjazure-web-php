@@ -149,8 +149,11 @@ Check Actions tasks:
 - Action for Azure https://docs.microsoft.com/en-us/azure/developer/github/github-actions
 - Deploy to Azure Web App https://github.com/Azure/webapps-deploy
 
+Configure following
+
+- Configure Web App settings WEBSITE_WEBDEPLOY_USE_SCM = true
+- Create new GitHub repository secret named AZURE_WEBAPP_PUBLISH_PROFILE - https://aka.ms/create-secrets-for-GitHub-workflows
+
 You can find my YAML definition [jjwebphpsymphony-cicd.yml](/.github/workflows/jjwebphpsymphony-cicd.yml) and import it.
 
-**Deployment for PHP is not supported now**
-
-![GitHub Actions](.images/actions-unsupported.png)
+![GitHub Actions](.images/actions-run.png)

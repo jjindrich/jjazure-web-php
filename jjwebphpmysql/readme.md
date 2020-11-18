@@ -1,17 +1,17 @@
 # JJWeb PHP with MySql
 
-## Deployment in Azure
+## Deployment Azure VM with Azure MySql
 
 It creates
 
-- Azure Database for MySql (without SSL enforcement)
+- Azure Database for MySql (disabled SSL enforcement)
 - Virtual Machine Ubuntu
 
 Run ARM deployment [deploy.ps1](arm-deploy/deploy.ps1)
 
 Login into VM with SSH and run [install.sh](src-php/install.sh)
 
-## Run connectivity test
+### Run connectivity test
 
 ```bash
 watch -n 1 time php -f select.php
@@ -46,7 +46,7 @@ Connected in 0.0025179386138916 seconds
 Connected in 0.0014710426330566 seconds
 ```
 
-## Run connectivity test with DotNet Core
+### Run connectivity test with DotNet Core
 
 ```bash
 dotnet build .
@@ -67,7 +67,7 @@ Executed in 00:00:00.0023343
 Executed in 00:00:00.0025311
 ```
 
-## Run connectivity test to mySql running in container
+### Run connectivity test to mySql running in container
 
 Provision mySql on Azure Container Instance and update connection string to jjtestmysql.westeurope.azurecontainer.io
 
@@ -105,7 +105,7 @@ Connected in 0.009221076965332 seconds
 Connected in 0.0051779747009277 seconds
 ```
 
-## Run connectivity test with ProxySql
+### Run connectivity test with ProxySql
 
 Install ProxySql on Azure Virtual Machine https://proxysql.com/documentation/installing-proxysql/
 
@@ -140,7 +140,7 @@ active = 1
 )
 ```
 
-Star it and test it
+Start it and test it
 
 ```bash
 service proxysql start
@@ -177,4 +177,75 @@ Connected in 0.00014400482177734 seconds
 Connected in 0.00012302398681641 seconds
 Connected in 0.00012516975402832 seconds
 Connected in 0.00014281272888184 seconds
+```
+
+## Deployment Azure VM with Azure MariaDb
+
+It creates
+
+- Azure Database for MariaDb (disabled SSL enforcement)
+- Virtual Machine Ubuntu
+
+Run ARM deployment [deploy.ps1](arm-deploy/deploy.ps1)
+
+Login into VM with SSH and run [install.sh](src-php/install.sh)
+
+### Run connectivity test with Azure Redirect and MariaDb
+
+Install Azure Redirect on Azure Virtual Machine https://docs.microsoft.com/en-us/azure/mariadb/howto-redirection
+
+- allow SSL enforcement
+- configure MariaDb Server parameter to redirect_enabled=ON
+- install extension
+- change PHP code - uncomment SSL section
+ 
+```bash
+sudo apt-get install php-pear
+sudo apt-get install php7.2-dev
+sudo pecl install mysqlnd_azure
+
+#php -i | grep "dir for additional .ini files"
+#ls /etc/php/7.2/cli/conf.d
+sudo cat > /etc/php/7.2/cli/conf.d/20-mysqlnd-azure.ini << EOF
+extension=mysqlnd_azure
+mysqlnd_azure.enableRedirect = on
+EOF
+
+wget https://www.digicert.com/CACerts/BaltimoreCyberTrustRoot.crt.pem
+```
+
+Start it and test it
+
+```bash
+php -f select.php
+```
+
+Results using MariaDb
+
+```bash
+Connected in 0.063371181488037 seconds
+Connected in 0.076151847839355 seconds
+Connected in 0.070934057235718 seconds
+Connected in 0.10379505157471 seconds
+Connected in 0.087983131408691 seconds
+Connected in 0.070410966873169 seconds
+Connected in 0.06370210647583 seconds
+Connected in 0.05185604095459 seconds
+Connected in 0.070175886154175 seconds
+Connected in 0.18419814109802 seconds
+```
+
+Results using MariaDb with Azure Redirect
+
+```bash
+Connected in 0.079926013946533 seconds
+Connected in 0.012449026107788 seconds
+Connected in 0.011750936508179 seconds
+Connected in 0.011090993881226 seconds
+Connected in 0.010484933853149 seconds
+Connected in 0.015083074569702 seconds
+Connected in 0.011795997619629 seconds
+Connected in 0.010118961334229 seconds
+Connected in 0.011577129364014 seconds
+Connected in 0.010071992874146 seconds
 ```

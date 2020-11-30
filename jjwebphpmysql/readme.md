@@ -249,3 +249,5 @@ Connected in 0.010118961334229 seconds
 Connected in 0.011577129364014 seconds
 Connected in 0.010071992874146 seconds
 ```
+
+You can use App Service with custom PHP image https://github.com/msimecek/WebApps-PHP-MySQL-Redirect

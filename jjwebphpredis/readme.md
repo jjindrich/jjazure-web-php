@@ -16,3 +16,8 @@ composer require predis/predis
 
 php -f query.php
 ```
+
+```bash
+Time taken by set command: 0.015801906585693 seconds
+Time taken by get command: 0.0015490055084229 seconds
+```

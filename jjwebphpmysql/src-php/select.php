@@ -1,5 +1,5 @@
 <?php
-require("config.inc.php")
+require("config.inc.php");
 
 for ($i = 1; $i <= 10; $i++) {
     $time_start = microtime(true);

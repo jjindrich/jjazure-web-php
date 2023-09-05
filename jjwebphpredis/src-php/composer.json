@@ -1,0 +1,14 @@
+{
+    "name": "jj/jjwebphpredis",
+    "type": "project",
+    "authors": [
+        {
+            "name": "JJ",
+            "email": "jj@jjazure.org"
+        }
+    ],
+    "require": {
+        "php": "^7.4",
+        "predis/predis": "^1.1"
+    }
+}

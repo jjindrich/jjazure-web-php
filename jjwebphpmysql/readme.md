@@ -1,5 +1,7 @@
 # JJWeb PHP with MySql
 
+OLD - not updated - it used Single Server deployment. Flexible server has better performance by default
+
 ## Deployment Azure VM with Azure MySql
 
 It creates
